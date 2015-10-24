@@ -52,6 +52,7 @@ public class Play {
 	JButton new_game = new JButton("New Game");
 	JButton add_piece = new JButton("Add Piece");
 	JButton start_game = new JButton("Start Game");
+	JButton move_on = new JButton("Next Move");
 
 	public Play(){
 		start_position_board();
@@ -70,17 +71,18 @@ public class Play {
 		start_position_board();
 		next_move();
 
-		
-
-		//alpha_beta();
-		
-		//EvaluateBoard evaluatedBoard = new EvaluateBoard( board, color_value) ;
-		//int evaluate_board = evaluatedBoard.result;
-		//System.out.println(evaluate_board);
 
 	}
 	
 	void next_move(){
+		if(!board.containsValue(-1) && !board.containsValue(9)){
+			System.out.println("Black wins the game");
+		}
+		if(!board.containsValue(1) && !board.containsValue(11)){
+			System.out.println("White wins the game");
+		}
+		list_of_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+		list_of_best_moves = new HashMap<HashMap<Point, Integer>,Integer>();
 		for (Map.Entry<Point, Integer> entry : board.entrySet()) {
 			if(entry.getValue()==color_value || entry.getValue()==color_value+10){
 				Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
@@ -97,23 +99,37 @@ public class Play {
 		if(max>0){
 			list_of_moves.values().removeAll(Collections.singleton(0));
 		}
+		if(list_of_moves.size()==0){
+			System.out.println("Opponent wins the game");
+		}
+		System.out.println("list of moves size "+list_of_moves.size());
 		list_of_potential_moves.putAll(list_of_moves);
-		System.out.println("size "+list_of_potential_moves.size());
+		alpha = -100000;
+		beta = 100000;
 		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_potential_moves.entrySet()) {
-			System.out.println("size 1 "+list_of_potential_moves.size());
 //			show(entry.getKey());
 			depth = 0;
 			list_of_best_moves.put(entry.getKey(), alpha_beta(entry.getKey(), alpha, beta, depth));
 
 		}
+		ArrayList<HashMap<Point, Integer>> choose_next_move = new ArrayList<HashMap<Point, Integer>>();
+		boolean move_chosen = false;
+		System.out.println(move_chosen);
 		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_best_moves.entrySet()) {
-			//			System.out.println("alpha or beta  "+entry.getValue());
+						System.out.println("alpha or beta  "+entry.getValue());
 			
 			if(entry.getValue() == Collections.max(list_of_best_moves.values())){
 				board = entry.getKey();
+				move_chosen = true;
+			}
+			else{
+				choose_next_move.add(entry.getKey());
 			}
 		}
-
+		if(!move_chosen){
+			board = choose_next_move.get(0);
+		}
+		System.out.println(move_chosen);
 		show(board);
 
 	}
@@ -345,7 +361,7 @@ public class Play {
 			}
 		}
 
-			board.put(new Point(2,2), 1+10);
+/*			board.put(new Point(2,2), 1+10);
 		board.put(new Point(1,3), -1);
 		board.put(new Point(0,6), 99);
 		board.put(new Point(2,6), 99);
@@ -353,7 +369,7 @@ public class Play {
 		board.put(new Point(1,5), -1);
 
 		
-/*		board.put(new Point(4,4), -1);
+		board.put(new Point(4,4), -1);
 		board.put(new Point(4,2), 99);
 		board.put(new Point(2,4), 1);
 		board.put(new Point(3,5), 99);
@@ -391,12 +407,22 @@ public class Play {
 			}
 		});
 
+		move_on.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent ev) {
+
+				board = plainBoard.configuration;
+				next_move();
+			}
+		});
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		buttonPanel.add(new_game);
 		buttonPanel.add(add_piece);
 		buttonPanel.add(start_game);
+		buttonPanel.add(move_on);
 		mainFrame.add(buttonPanel, BorderLayout.EAST);
 	}
 
