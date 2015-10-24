@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 public class PlainBoard extends JPanel{
 	
 	HashMap<Point, Integer> configuration = new HashMap<Point, Integer>();
-	
+	int sizeVar = 5;
 	public PlainBoard(HashMap<Point, Integer> configuration){
 		this.configuration = configuration;
 //		setMinimumSize(new Dimension(800,800));
@@ -52,7 +52,7 @@ public class PlainBoard extends JPanel{
 	    	else{
 	    		g2.setColor(red);
 	    	}
-	    		g2.fillRect(100*i, 100*j, 100, 100);
+	    		g2.fillRect(10*sizeVar*i, 10*sizeVar*j, 10*sizeVar, 10*sizeVar);
 	    	}
 	    }
 	    
@@ -60,25 +60,25 @@ public class PlainBoard extends JPanel{
 	    for (Map.Entry<Point, Integer> entry : configuration.entrySet()) {
 	    	if(entry.getValue()==1){
 	    		g2.setColor(black);
-	    		g2.fillOval(entry.getKey().x*100, entry.getKey().y*100, 100, 100);
+	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    	}
 	    	else if(entry.getValue()==-1){
 	    		g2.setColor(white);
-	    		g2.fillOval(entry.getKey().x*100, entry.getKey().y*100, 100, 100);
+	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    	}
 	    	else if(entry.getValue()==11){
 	    		g2.setColor(black);
-	    		g2.fillOval(entry.getKey().x*100, entry.getKey().y*100, 100, 100);
+	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    		g2.setStroke(new BasicStroke(5));
 	    		g2.setColor(gold);
-	    		g2.drawOval(entry.getKey().x*100+15, entry.getKey().y*100+15, 70, 70);
+	    		g2.drawOval(entry.getKey().x*10*sizeVar+15, entry.getKey().y*10*sizeVar+15, 7*sizeVar, 7*sizeVar);
 	    	}
 	    	else if(entry.getValue()==9){
 	    		g2.setColor(white);
-	    		g2.fillOval(entry.getKey().x*100, entry.getKey().y*100, 100, 100);
+	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    		g2.setStroke(new BasicStroke(5));
 	    		g2.setColor(gold);
-	    		g2.drawOval(entry.getKey().x*100+15, entry.getKey().y*100+15, 70, 70);
+	    		g2.drawOval(entry.getKey().x*10*sizeVar+15, entry.getKey().y*10*sizeVar+15, 7*sizeVar, 7*sizeVar);
 	    	}
 	    }
 	}

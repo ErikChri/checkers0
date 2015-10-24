@@ -31,6 +31,7 @@ public class Play {
 	int alpha, beta;
 	boolean second_move, black, max = true;
 
+	int sizeVar = 5;
 	int move_value = 0;
 	int capture_value = 0;
 	int color_value =1;
@@ -52,11 +53,11 @@ public class Play {
 
 		mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		//	mainFrame.setPreferredSize(new Dimension(820,820));
-		mainFrame.setMinimumSize(new Dimension(1020, 860));
+		mainFrame.setMinimumSize(new Dimension(102*sizeVar, 86*sizeVar));
 		mainFrame.setLayout(new BorderLayout());
 		//		board = new Board();
 		plainBoard = new PlainBoard(board);
-		plainBoard.setMinimumSize(new Dimension(800,800));
+		plainBoard.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
 		mainFrame.add(plainBoard, BorderLayout.CENTER);
 		mainFrame.setVisible(true);
 
@@ -97,13 +98,13 @@ public class Play {
 				JFrame mainFrame = new JFrame("Point "+entry.getKey());
 				mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 				//	mainFrame.setPreferredSize(new Dimension(820,820));
-				mainFrame.setMinimumSize(new Dimension(1020, 860));
+				mainFrame.setMinimumSize(new Dimension(102*sizeVar, 86*sizeVar));
 				mainFrame.setLayout(new BorderLayout());
 //				System.out.println("entry.getKey()  "+entry.getKey());
 				board = entry.getKey();
 				
 				plainBoard = new PlainBoard(board);
-				plainBoard.setMinimumSize(new Dimension(800,800));
+				plainBoard.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
 				mainFrame.add(plainBoard, BorderLayout.CENTER);
 				mainFrame.setVisible(true);
 
