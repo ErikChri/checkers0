@@ -28,8 +28,8 @@ public class Play {
 
 	// Alpha-beta variables
 	int depth =0;
-	int depthLimit = 4;
-	int alpha = 1;
+	int depthLimit = 3;
+	int alpha = -100000;
 	int beta = 100000;
 	int board_value_next = 0;
 	boolean second_move, black;
@@ -58,7 +58,7 @@ public class Play {
 
 		mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		//	mainFrame.setPreferredSize(new Dimension(820,820));
-		mainFrame.setMinimumSize(new Dimension(102*sizeVar, 86*sizeVar));
+		mainFrame.setMinimumSize(new Dimension(102*sizeVar, 88*sizeVar));
 		mainFrame.setLayout(new BorderLayout());
 		//		board = new Board();
 		plainBoard = new PlainBoard(board);
@@ -68,33 +68,9 @@ public class Play {
 
 		addButtons();
 		start_position_board();
+		next_move();
 
-
-		for (Map.Entry<Point, Integer> entry : board.entrySet()) {
-			if(entry.getValue()==color_value || entry.getValue()==color_value+10){
-				Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
-				generate_move(board, point_to_move);   
-			}
-
-		}
-		HashMap<HashMap<Point, Integer>, Integer> list_of_potential_moves = new HashMap<HashMap<Point, Integer>,Integer>();
-		list_of_potential_moves.putAll(list_of_moves);
-		System.out.println("size "+list_of_potential_moves.size());
-		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_potential_moves.entrySet()) {
-			System.out.println("size 1 "+list_of_potential_moves.size());
-			depth = 0;
-			list_of_best_moves.put(entry.getKey(), alpha_beta(entry.getKey(), alpha, beta, depth));
-
-		}
-		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_best_moves.entrySet()) {
-			//			System.out.println("alpha or beta  "+entry.getValue());
-			if(entry.getValue() == Collections.max(list_of_best_moves.values())){
-				board = entry.getKey();
-			}
-		}
-
-		show(board);
-
+		
 
 		//alpha_beta();
 		
@@ -103,19 +79,59 @@ public class Play {
 		//System.out.println(evaluate_board);
 
 	}
-	void show(HashMap<Point, Integer> board){
+	
+	void next_move(){
+		for (Map.Entry<Point, Integer> entry : board.entrySet()) {
+			if(entry.getValue()==color_value || entry.getValue()==color_value+10){
+				Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
+				generate_move(board, point_to_move);   
+			}
 
+		}
+		HashMap<HashMap<Point, Integer>, Integer> list_of_potential_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+		int max =0;
+		if(list_of_moves.size()>0){
+			max = Collections.max(list_of_moves.values());
+		}
+
+		if(max>0){
+			list_of_moves.values().removeAll(Collections.singleton(0));
+		}
+		list_of_potential_moves.putAll(list_of_moves);
+		System.out.println("size "+list_of_potential_moves.size());
+		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_potential_moves.entrySet()) {
+			System.out.println("size 1 "+list_of_potential_moves.size());
+//			show(entry.getKey());
+			depth = 0;
+			list_of_best_moves.put(entry.getKey(), alpha_beta(entry.getKey(), alpha, beta, depth));
+
+		}
+		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_best_moves.entrySet()) {
+			//			System.out.println("alpha or beta  "+entry.getValue());
+			
+			if(entry.getValue() == Collections.max(list_of_best_moves.values())){
+				board = entry.getKey();
+			}
+		}
+
+		show(board);
+
+	}
+	
+	void show(HashMap<Point, Integer> board){
 		mainFrame.remove(plainBoard);
 		plainBoard = new PlainBoard(board);
 		mainFrame.add(plainBoard, BorderLayout.CENTER);
+		
 		mainFrame.repaint();
 		mainFrame.revalidate();
 	}
 
 	//Min-max and alpha-beta algorithm
 	int alpha_beta(HashMap<Point, Integer> testBoard, int alpha, int beta, int depth){
-		System.out.println("depth  "+depth);
+		
 				depth++;
+		System.out.println("depth  "+depth);		
 		if(depth%2==0){
 			max=true;
 		}
@@ -124,13 +140,9 @@ public class Play {
 		}
 		if(depth == depthLimit){
  
-			// Preliminary Board evaluation
-			//EvaluateBoard ev = new EvaluateBoard();
-//			return ev.result;
- 
-			//evaluate leaf node boards
-			//EvaluateBoard evaluatedBoard = new EvaluateBoard( board) ;
-			//int evaluate_board = evaluatedBoard.result;
+			EvaluateBoard ev = new EvaluateBoard(testBoard, 1);
+			int evaluate_board = ev.sum;
+			return evaluate_board;
  
 		}
 		else if(max){  // Maximazing level
@@ -141,7 +153,7 @@ public class Play {
 			for (Map.Entry<Point, Integer> entry : board.entrySet()) {
 				if(entry.getValue()==color_value || entry.getValue()==color_value+10){
 					Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
-					generate_move(board, point_to_move);   
+					generate_move(testBoard, point_to_move);   
 				}
 			}
 			int max =0;
@@ -201,7 +213,7 @@ public class Play {
 			for (Map.Entry<Point, Integer> entry : board.entrySet()) {
 				if(entry.getValue()==color_value || entry.getValue()==color_value+10){
 					Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
-					generate_move(board, point_to_move);   
+					generate_move(testBoard, point_to_move);   
 				}
 			}
 			int max =0;
@@ -333,15 +345,21 @@ public class Play {
 			}
 		}
 
-		board.put(new Point(2,2), 1+10);
+			board.put(new Point(2,2), 1+10);
 		board.put(new Point(1,3), -1);
 		board.put(new Point(0,6), 99);
 		board.put(new Point(2,6), 99);
 		board.put(new Point(3,3), -1);
-		board.put(new Point(1,5), 99);
+		board.put(new Point(1,5), -1);
+
+		
+/*		board.put(new Point(4,4), -1);
+		board.put(new Point(4,2), 99);
+		board.put(new Point(2,4), 1);
+		board.put(new Point(3,5), 99);
 
 
-		 board.put(new Point(2,2), 1+10);
+	 board.put(new Point(2,2), 1+10);
 		 board.put(new Point(1,3), -1);
 		 board.put(new Point(0,6), 99);
 		 board.put(new Point(2,6), 99);
@@ -349,8 +367,8 @@ public class Play {
 		 board.put(new Point(1,5), 99);
 		 board.put(new Point(1,5), -1);
 		 board.put(new Point(6,4), 1);
-		 board.put(new Point(6,2), 99);
-		EvaluateBoard evaluatedBoard = new EvaluateBoard( board, color_value) ;
+		 board.put(new Point(6,2), 99);*/
+//		EvaluateBoard evaluatedBoard = new EvaluateBoard( board, color_value) ;
 
 	}
 

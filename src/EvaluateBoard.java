@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class EvaluateBoard {
 	
-	int result = 0;
+//	int result = 0;
 	int sum = 0;
  
 	public EvaluateBoard( HashMap<Point, Integer> inputBoard, int color_value ) {
@@ -35,7 +35,7 @@ public class EvaluateBoard {
 			}			
 		}	
 	
-	System.out.println(sum);	
+//	System.out.println(sum);	
 	}
 	
 	public int checkIfCaptures(Point entryPosition, HashMap<Point, Integer> inputBoard, int val) {
