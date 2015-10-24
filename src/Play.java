@@ -69,6 +69,7 @@ public class Play {
 		addButtons();
 		start_position_board();
 
+
 		for (Map.Entry<Point, Integer> entry : board.entrySet()) {
 			if(entry.getValue()==color_value || entry.getValue()==color_value+10){
 				Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
@@ -94,6 +95,13 @@ public class Play {
 
 		show(board);
 
+
+		//alpha_beta();
+		
+		//EvaluateBoard evaluatedBoard = new EvaluateBoard( board, color_value) ;
+		//int evaluate_board = evaluatedBoard.result;
+		//System.out.println(evaluate_board);
+
 	}
 	void show(HashMap<Point, Integer> board){
 
@@ -115,10 +123,15 @@ public class Play {
 			max = false;
 		}
 		if(depth == depthLimit){
+ 
 			// Preliminary Board evaluation
-			EvaluateBoard ev = new EvaluateBoard();
+			//EvaluateBoard ev = new EvaluateBoard();
 //			return ev.result;
-			
+ 
+			//evaluate leaf node boards
+			//EvaluateBoard evaluatedBoard = new EvaluateBoard( board) ;
+			//int evaluate_board = evaluatedBoard.result;
+ 
 		}
 		else if(max){  // Maximazing level
 			// Generate list of moves
@@ -319,12 +332,25 @@ public class Play {
 				}
 			}
 		}
+
 		board.put(new Point(2,2), 1+10);
 		board.put(new Point(1,3), -1);
 		board.put(new Point(0,6), 99);
 		board.put(new Point(2,6), 99);
 		board.put(new Point(3,3), -1);
 		board.put(new Point(1,5), 99);
+
+
+		 board.put(new Point(2,2), 1+10);
+		 board.put(new Point(1,3), -1);
+		 board.put(new Point(0,6), 99);
+		 board.put(new Point(2,6), 99);
+		 board.put(new Point(3,3), -1);
+		 board.put(new Point(1,5), 99);
+		 board.put(new Point(1,5), -1);
+		 board.put(new Point(6,4), 1);
+		 board.put(new Point(6,2), 99);
+		EvaluateBoard evaluatedBoard = new EvaluateBoard( board, color_value) ;
 
 	}
 
