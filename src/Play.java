@@ -65,11 +65,11 @@ public class Play {
 
 		addButtons();
 		start_position_board();
-		alpha_beta();
+		//alpha_beta();
 		
-		EvaluateBoard evaluatedBoard = new EvaluateBoard( board) ;
-		int evaluate_board = evaluatedBoard.result;
-		System.out.println(evaluate_board);
+		//EvaluateBoard evaluatedBoard = new EvaluateBoard( board, color_value) ;
+		//int evaluate_board = evaluatedBoard.result;
+		//System.out.println(evaluate_board);
 		
 	}
 
@@ -79,8 +79,8 @@ public class Play {
 		
 		if(depth == depthLimit){
 			//evaluate leaf node boards
-			EvaluateBoard evaluatedBoard = new EvaluateBoard( board) ;
-			int evaluate_board = evaluatedBoard.result;
+			//EvaluateBoard evaluatedBoard = new EvaluateBoard( board) ;
+			//int evaluate_board = evaluatedBoard.result;
 		}
 		else if(max){  
 			// Generate list of moves
@@ -254,13 +254,16 @@ public class Play {
 				}
 			}
 		}
-		// board.put(new Point(2,2), 1+10);
-		// board.put(new Point(1,3), -1);
-		//board.put(new Point(0,6), 99);
-		//board.put(new Point(2,6), 99);
-		//board.put(new Point(3,3), -1);
-		//board.put(new Point(1,5), 99);
-		
+		 board.put(new Point(2,2), 1+10);
+		 board.put(new Point(1,3), -1);
+		 board.put(new Point(0,6), 99);
+		 board.put(new Point(2,6), 99);
+		 board.put(new Point(3,3), -1);
+		 board.put(new Point(1,5), 99);
+		 board.put(new Point(1,5), -1);
+		 board.put(new Point(6,4), 1);
+		 board.put(new Point(6,2), 99);
+		EvaluateBoard evaluatedBoard = new EvaluateBoard( board, color_value) ;
 	}
 
 	void addButtons(){
