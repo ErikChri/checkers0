@@ -71,14 +71,14 @@ public class PlainBoard extends JPanel{
 	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    		g2.setStroke(new BasicStroke(5));
 	    		g2.setColor(gold);
-	    		g2.drawOval(entry.getKey().x*10*sizeVar+15, entry.getKey().y*10*sizeVar+15, 7*sizeVar, 7*sizeVar);
+	    		g2.drawOval(entry.getKey().x*10*sizeVar+10, entry.getKey().y*10*sizeVar+10, 7*sizeVar, 7*sizeVar);
 	    	}
 	    	else if(entry.getValue()==9){
 	    		g2.setColor(white);
 	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    		g2.setStroke(new BasicStroke(5));
 	    		g2.setColor(gold);
-	    		g2.drawOval(entry.getKey().x*10*sizeVar+15, entry.getKey().y*10*sizeVar+15, 7*sizeVar, 7*sizeVar);
+	    		g2.drawOval(entry.getKey().x*10*sizeVar+10, entry.getKey().y*10*sizeVar+15, 7*sizeVar, 7*sizeVar);
 	    	}
 	    }
 	}

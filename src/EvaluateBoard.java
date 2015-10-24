@@ -6,8 +6,7 @@ public class EvaluateBoard {
 	int result = 0;
 	
  
-	public EvaluateBoard( HashMap<Point, Integer> inputBoard ) {
-		
+	public EvaluateBoard( ) {
 		
 		
 		
