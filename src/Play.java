@@ -25,6 +25,8 @@ public class Play {
 	PlainBoard plainBoard;
 	//	Board board;
 
+	//Iterative deepening variables
+	
 	// Alpha-beta variables
 	int depth =0;
 	int depthLimit =2;
@@ -64,14 +66,21 @@ public class Play {
 		addButtons();
 		start_position_board();
 		alpha_beta();
-
+		
+		EvaluateBoard evaluatedBoard = new EvaluateBoard( board) ;
+		int evaluate_board = evaluatedBoard.result;
+		System.out.println(evaluate_board);
+		
 	}
 
 	//Min-max and alpha-beta algorithm
 	int alpha_beta(){
 
+		
 		if(depth == depthLimit){
-			evaluate_board(board);
+			//evaluate leaf node boards
+			EvaluateBoard evaluatedBoard = new EvaluateBoard( board) ;
+			int evaluate_board = evaluatedBoard.result;
 		}
 		else if(max){  
 			// Generate list of moves
@@ -197,14 +206,6 @@ public class Play {
 
 	}
 
-
-
-	int evaluate_board(HashMap<Point, Integer> board){
-//		System.out.println(board);
-		return 0;
-	}
-
-
 	void start_position_board(){
 		board = new HashMap<Point, Integer>();
 		int value = 1;
@@ -253,12 +254,12 @@ public class Play {
 				}
 			}
 		}
-		board.put(new Point(2,2), 1+10);
-		board.put(new Point(1,3), -1);
-		board.put(new Point(0,6), 99);
-		board.put(new Point(2,6), 99);
-		board.put(new Point(3,3), -1);
-		board.put(new Point(1,5), 99);
+		// board.put(new Point(2,2), 1+10);
+		// board.put(new Point(1,3), -1);
+		//board.put(new Point(0,6), 99);
+		//board.put(new Point(2,6), 99);
+		//board.put(new Point(3,3), -1);
+		//board.put(new Point(1,5), 99);
 		
 	}
 
