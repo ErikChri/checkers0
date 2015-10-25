@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class EvaluateBoard {
 	
-//	int result = 0;
+	static int counter = 0;
 	int sum = 0;
  
 	public EvaluateBoard( HashMap<Point, Integer> inputBoard, int color_value ) {
@@ -46,7 +46,7 @@ public class EvaluateBoard {
 		//for pawn only - make condition	
 		if(x <7 && x>0 ){ 
 		 
-			if(inputBoard.get(new Point(x+1, y+1))==-1 && inputBoard.containsKey(new Point(x+2, y+2)) ){
+			if(inputBoard.containsKey(new Point(x+2, y+2)) && inputBoard.get(new Point(x+1, y+1))==-1){
 				if (inputBoard.get(new Point(x+2, y+2))==99){
 					//System.out.println("x:"+x + ", y:"+y + " to ->x+2, y+2" );
 					val++;
@@ -55,7 +55,7 @@ public class EvaluateBoard {
 					val = checkIfCaptures(new Point(x+2, y+2), inputBoard, val );	    
 				}
 			};
-			if(inputBoard.get(new Point(x-1, y+1))==-1 && inputBoard.containsKey(new Point(x-2, y+2))){
+			if(inputBoard.containsKey(new Point(x-2, y+2)) && inputBoard.get(new Point(x-1, y+1))==-1){
 				if (inputBoard.get(new Point(x-2, y+2))==99){
 					//System.out.println("x:"+x + ", y:"+y + " to ->x-2, y+2" );
 					//System.out.println(val );
@@ -65,7 +65,7 @@ public class EvaluateBoard {
 				}
 			};
 		} else if (x==7){
-			if(inputBoard.get(new Point(x-1, y+1))==-1 && inputBoard.containsKey(new Point(x-2, y+2))){
+			if(inputBoard.containsKey(new Point(x-2, y+2)) && inputBoard.get(new Point(x-1, y+1))==-1){
 				if (inputBoard.get(new Point(x-2, y+2))==99){
 					//System.out.println("x:"+x + ", y:"+y + " to ->x-2, y+2" );
 					val++;
@@ -74,7 +74,7 @@ public class EvaluateBoard {
 				}
 			}; 
 		} else if(x==0) {
-			if(inputBoard.get(new Point(x+1, y+1))==-1 && inputBoard.containsKey(new Point(x+2, y+2))){
+			if(inputBoard.containsKey(new Point(x+2, y+2)) && inputBoard.get(new Point(x+1, y+1))==-1){
 				if (inputBoard.get(new Point(x+2, y+2))==99){
 					//System.out.println("x:"+x + ", y:"+y + " to ->x+2, y+2" );
 					val++; 
@@ -89,6 +89,8 @@ public class EvaluateBoard {
 	}
 	
 	public int CanBeCaptured(Point entryPosition, HashMap<Point, Integer> inputBoard, int val){
+		counter++;
+		System.out.println("Doing board evaluation "+counter);
 		int x = entryPosition.x;
 		int y = entryPosition.y; 
 		if( x !=7 && x!=0  &&  y!=0 && y!=7){ 

@@ -22,19 +22,20 @@ import javax.swing.WindowConstants;
 
 public class Play {
 
+	static int counter = 0;
 	JFrame mainFrame = new JFrame("Checkers");
 	PlainBoard plainBoard;
 	//	Board board;
 
 	// Alpha-beta variables
 	int depth =0;
-	int depthLimit = 3;
-	int alpha = -100000;
-	int beta = 100000;
+	int depthLimit = 9;
+//	int alpha = -100000;
+//	int beta = 100000;
 	int board_value_next = 0;
 	boolean second_move, black;
 	boolean max = true;
-
+	long t1 = System.currentTimeMillis();
 	int sizeVar = 5;
 	int move_value = 0;
 	int capture_value = 0;
@@ -102,21 +103,16 @@ public class Play {
 		if(list_of_moves.size()==0){
 			System.out.println("Opponent wins the game");
 		}
-		System.out.println("list of moves size "+list_of_moves.size());
+//		System.out.println("list of moves size "+list_of_moves.size());
 		list_of_potential_moves.putAll(list_of_moves);
-		alpha = -100000;
-		beta = 100000;
 		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_potential_moves.entrySet()) {
-//			show(entry.getKey());
 			depth = 0;
-			list_of_best_moves.put(entry.getKey(), alpha_beta(entry.getKey(), alpha, beta, depth));
+			list_of_best_moves.put(entry.getKey(), alpha_beta(entry.getKey(), -100000, 100000, depth));
 
 		}
 		ArrayList<HashMap<Point, Integer>> choose_next_move = new ArrayList<HashMap<Point, Integer>>();
 		boolean move_chosen = false;
-		System.out.println(move_chosen);
 		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_best_moves.entrySet()) {
-						System.out.println("alpha or beta  "+entry.getValue());
 			
 			if(entry.getValue() == Collections.max(list_of_best_moves.values())){
 				board = entry.getKey();
@@ -129,7 +125,6 @@ public class Play {
 		if(!move_chosen){
 			board = choose_next_move.get(0);
 		}
-		System.out.println(move_chosen);
 		show(board);
 
 	}
@@ -141,13 +136,15 @@ public class Play {
 		
 		mainFrame.repaint();
 		mainFrame.revalidate();
+		System.out.println("Time: "+((System.currentTimeMillis())-t1));
 	}
 
 	//Min-max and alpha-beta algorithm
 	int alpha_beta(HashMap<Point, Integer> testBoard, int alpha, int beta, int depth){
-		
+		counter++;
 				depth++;
-		System.out.println("depth  "+depth);		
+				System.out.println("Doing the alpha-beta "+counter);
+//		System.out.println("depth  "+depth);		
 		if(depth%2==0){
 			max=true;
 		}
@@ -156,15 +153,17 @@ public class Play {
 		}
 		if(depth == depthLimit){
  
-			EvaluateBoard ev = new EvaluateBoard(testBoard, 1);
+			EvaluateBoard ev = new EvaluateBoard(testBoard, -1*color_value);
 			int evaluate_board = ev.sum;
+//			System.out.println("evaluation  "+evaluate_board+" color value "+color_value);
+			
 			return evaluate_board;
  
 		}
 		else if(max){  // Maximazing level
 			// Generate list of moves
-			//			moves = new ArrayList<Move>();
-			System.out.println(" maximazing  ");
+			
+			color_value = 1;
 			list_of_moves = new HashMap<HashMap<Point, Integer>,Integer>();
 			for (Map.Entry<Point, Integer> entry : board.entrySet()) {
 				if(entry.getValue()==color_value || entry.getValue()==color_value+10){
@@ -189,14 +188,16 @@ public class Play {
 					list_of_next_moves.add(entry.getKey());
 				}
 			}
+//			System.out.println("  size of list of moves "+list_of_moves.size());
 			while(alpha<beta && list_of_next_moves.size()>0){
 				board_value_next = alpha_beta(list_of_next_moves.get(0), alpha, beta, depth);
+//				System.out.println("board_value_next "+board_value_next+" alpha  "+alpha+" depth "+depth);
 				list_of_next_moves.remove(0);
 				if(board_value_next >alpha){
 					alpha = board_value_next;
 				}
 			}
-			System.out.println(" alpha  "+alpha);
+//			System.out.println(" alpha  "+alpha+" depth "+depth);
 			return alpha;
 
 
@@ -226,8 +227,9 @@ public class Play {
 		else if(!max){ //Minimizing level
 			// Generate list of moves
 			moves = new ArrayList<Move>();
+			color_value = -1;
 			for (Map.Entry<Point, Integer> entry : board.entrySet()) {
-				if(entry.getValue()==color_value || entry.getValue()==color_value+10){
+				if(entry.getValue()==-color_value || entry.getValue()==color_value+10){
 					Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
 					generate_move(testBoard, point_to_move);   
 				}
@@ -252,14 +254,15 @@ public class Play {
 			while(alpha<beta && list_of_next_moves.size()>0){
 				board_value_next = alpha_beta(list_of_next_moves.get(0), alpha, beta, depth);
 				list_of_next_moves.remove(0);
+//				System.out.println("board_value_next "+board_value_next+" beta  "+beta+" depth "+depth);
 				if(board_value_next < beta){
 					beta = board_value_next;
 				}
-				System.out.println(" beta  "+beta);
-				return beta;
+//				System.out.println(" beta  "+beta+" depth "+depth);
 			}
+			return beta;
 		}
-		System.out.println("end  ");
+		System.out.println("end alpha, beta "+alpha+", "+beta);
 		if(max){
 			return alpha;
 		}
@@ -304,12 +307,6 @@ public class Play {
 		}
 	}
 
-
-
-	int evaluate_board(HashMap<Point, Integer> board){
-		//		System.out.println(board);
-		return 0;
-	}
 
 
 	void start_position_board(){
@@ -411,7 +408,8 @@ public class Play {
 
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-
+				System.out.println("Quiet!!   I am thinking......");
+				t1 = System.currentTimeMillis();
 				board = plainBoard.configuration;
 				next_move();
 			}
