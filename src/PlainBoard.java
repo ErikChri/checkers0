@@ -129,7 +129,7 @@ public class PlainBoard extends JPanel implements MouseListener{
 		int x = e.getX()/(10*sizeVar);
 		int y = e.getY()/(10*sizeVar);
 		move_to = new Point(x,y);
-		if(y == 0 || y == 7){
+		if((y == 0 || y == 7) && color_value<9){
 			color_value = color_value +10;
 		}
 		configuration.put(move_to, color_value);

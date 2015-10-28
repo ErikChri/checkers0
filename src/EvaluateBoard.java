@@ -10,7 +10,7 @@ public class EvaluateBoard {
 	public EvaluateBoard( HashMap<Point, Integer> inputBoard, int color_value ) {
  
 		
-		for (Map.Entry<Point, Integer> entry : inputBoard.entrySet()) {
+/*		for (Map.Entry<Point, Integer> entry : inputBoard.entrySet()) {
 			
 			if(entry.getValue()==color_value ){
 				sum++;
@@ -30,11 +30,13 @@ public class EvaluateBoard {
 				sum-=100*isCapt;
 			} else if (entry.getValue()== -1){
 				sum -=1;
-			} else if (entry.getValue()== -1){
+			} else if (entry.getValue()== -1+10){
 				sum -=10;
 			}			
-		}	
-	
+		}	*/
+		
+	sum = (int)(Math.random()*1000);
+//	sum = -1*counter++;
 //	System.out.println(sum);	
 	}
 	
@@ -90,7 +92,7 @@ public class EvaluateBoard {
 	
 	public int CanBeCaptured(Point entryPosition, HashMap<Point, Integer> inputBoard, int val){
 		counter++;
-		System.out.println("Doing board evaluation "+counter);
+//		System.out.println("Doing board evaluation "+counter);
 		int x = entryPosition.x;
 		int y = entryPosition.y; 
 		if( x !=7 && x!=0  &&  y!=0 && y!=7){ 

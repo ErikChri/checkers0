@@ -6,7 +6,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.Map.Entry;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -29,13 +32,19 @@ public class Play {
 
 	// Alpha-beta variables
 	int depth =0;
-	int depthLimit = 9;
-//	int alpha = -100000;
-//	int beta = 100000;
+	int depthLimit = 0;
+	double average_branching_factor;
+	int number_of_leaf_nodes = 0;
+	int search_dept;
+	//	int alpha = -100000;
+	//	int beta = 100000;
 	int board_value_next = 0;
 	boolean second_move, black;
 	boolean max = true;
+	boolean out_of_time;
 	long t1 = System.currentTimeMillis();
+	long t2 = System.currentTimeMillis();
+	long time_for_move;
 	int sizeVar = 5;
 	int move_value = 0;
 	int capture_value = 0;
@@ -48,19 +57,26 @@ public class Play {
 	HashMap<Point, Point> move;
 	HashMap<HashMap<Point, Integer>, Integer> list_of_moves = new HashMap<HashMap<Point, Integer>,Integer>();
 	HashMap<HashMap<Point, Integer>, Integer> list_of_best_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+	HashMap<HashMap<Point, Integer>, Integer> list_of_potential_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+	ArrayList<HashMap<Point, Integer>> choose_next_move = new ArrayList<HashMap<Point, Integer>>();
+	ArrayList<HashMap<Point, Integer>>temp_choose_next_move = new ArrayList<HashMap<Point, Integer>>();
 
 	//Buttons
 	JButton new_game = new JButton("New Game");
 	JButton add_piece = new JButton("Add Piece");
 	JButton start_game = new JButton("Start Game");
 	JButton move_on = new JButton("Next Move");
+	JLabel time_for_this_move = new JLabel("Time for this move: "+time_for_move+" ms  ");
+	JLabel search_depth = new JLabel("Search depth: "+depth);
+	JLabel average_branching_fac = new JLabel("Average branching factor: "+average_branching_factor);
+	JPanel buttonPanel = new JPanel();
 
 	public Play(){
 		start_position_board();
 
 		mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		//	mainFrame.setPreferredSize(new Dimension(820,820));
-		mainFrame.setMinimumSize(new Dimension(102*sizeVar, 88*sizeVar));
+		mainFrame.setMinimumSize(new Dimension(125*sizeVar, 88*sizeVar));
 		mainFrame.setLayout(new BorderLayout());
 		//		board = new Board();
 		plainBoard = new PlainBoard(board);
@@ -74,7 +90,7 @@ public class Play {
 
 
 	}
-	
+
 	void next_move(){
 		if(!board.containsValue(-1) && !board.containsValue(9)){
 			System.out.println("Black wins the game");
@@ -84,14 +100,15 @@ public class Play {
 		}
 		list_of_moves = new HashMap<HashMap<Point, Integer>,Integer>();
 		list_of_best_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+		color_value = 1;
 		for (Map.Entry<Point, Integer> entry : board.entrySet()) {
 			if(entry.getValue()==color_value || entry.getValue()==color_value+10){
 				Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
-				generate_move(board, point_to_move);   
+				generate_move(board, point_to_move);  
+//				System.out.println("103 list of moves size "+list_of_moves.size()+"  board "+board);
 			}
-
 		}
-		HashMap<HashMap<Point, Integer>, Integer> list_of_potential_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+		
 		int max =0;
 		if(list_of_moves.size()>0){
 			max = Collections.max(list_of_moves.values());
@@ -103,17 +120,21 @@ public class Play {
 		if(list_of_moves.size()==0){
 			System.out.println("Opponent wins the game");
 		}
-//		System.out.println("list of moves size "+list_of_moves.size());
-		list_of_potential_moves.putAll(list_of_moves);
-		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_potential_moves.entrySet()) {
-			depth = 0;
-			list_of_best_moves.put(entry.getKey(), alpha_beta(entry.getKey(), -100000, 100000, depth));
 
-		}
-		ArrayList<HashMap<Point, Integer>> choose_next_move = new ArrayList<HashMap<Point, Integer>>();
-		boolean move_chosen = false;
+//System.out.println("118 list of moves "+list_of_moves.size());
+		list_of_potential_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+		list_of_potential_moves.putAll(list_of_moves);
+		choose_next_move = sort_list_of_moves(list_of_potential_moves);
+		
+//		System.out.println("123 chose move size "+choose_next_move.size());
+		out_of_time = false;
+		iteration();
+
+				
+		board = choose_next_move.get(0);
+		/*		boolean move_chosen = false;
 		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_best_moves.entrySet()) {
-			
+
 			if(entry.getValue() == Collections.max(list_of_best_moves.values())){
 				board = entry.getKey();
 				move_chosen = true;
@@ -124,187 +145,266 @@ public class Play {
 		}
 		if(!move_chosen){
 			board = choose_next_move.get(0);
-		}
+		}*/
 		show(board);
 
 	}
-	
+
+
+	void iteration(){
+
+		while(!out_of_time){
+			if(depthLimit%2==1){
+				temp_choose_next_move = new ArrayList<HashMap<Point, Integer>>();
+				temp_choose_next_move = choose_next_move;
+				search_dept = depthLimit;
+				average_branching_factor = number_of_leaf_nodes/search_dept;
+				number_of_leaf_nodes = 0;
+			}
+			depthLimit++;
+//			System.out.println(" 156 chose next move size "+choose_next_move.size()+" depthlimit "+depthLimit);
+			list_of_best_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+			for (int i=0; i<choose_next_move.size(); i++) {
+				depth = 0;
+				int v = alpha_beta(choose_next_move.get(i), -100000, 100000, depth);
+//								System.out.println("162  eval "+v+" depthlimit "+depthLimit+" chose next move size "+choose_next_move.size());
+				list_of_best_moves.put(choose_next_move.get(i), v);
+				
+			}
+
+			choose_next_move = sort_list_of_moves(list_of_best_moves);
+//			System.out.println("167 chose next move size "+choose_next_move.size()+" depth limit "+depthLimit);
+		}
+		
+		choose_next_move = temp_choose_next_move;
+		
+	}
+
+	private ArrayList<HashMap<Point, Integer>> sort_list_of_moves(HashMap<HashMap<Point, Integer>, Integer> list_to_sort){
+		Object[][] move_queu = new Object[list_to_sort.size()][2];
+		int i =0;
+		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_to_sort.entrySet()) {
+			move_queu[i][0] = entry.getValue();
+			move_queu[i][1] = entry.getKey();
+			i++;
+		}
+
+		Arrays.sort(move_queu, new Comparator<Object[]>() {
+			@Override
+			public int compare(Object[] entry1, Object[] entry2) {
+				Integer move1 = (Integer) entry1[0];
+				Integer move2 = (Integer) entry2[0];
+				return move1.compareTo(move2);
+			}
+		}); 
+
+		choose_next_move.removeAll(choose_next_move);
+		for(int j=0; j<move_queu.length;  j++){
+			choose_next_move.add(0, (HashMap<Point, Integer>) move_queu[j][1]);
+		}
+		return choose_next_move;
+
+	}
+
 	void show(HashMap<Point, Integer> board){
+		t2 = System.currentTimeMillis();
+		time_for_move = t2-t1;
+//		time_for_move = 100;
+		System.out.println("Time   1: "+((System.currentTimeMillis())-t1)+"   Time for move "+time_for_move+" t1 "+t1+" t2 "+t2);
+		buttonPanel.remove(time_for_this_move);
+		buttonPanel.remove(search_depth);
+		buttonPanel.remove(average_branching_fac);
+		time_for_this_move = new JLabel("Time for this move: "+time_for_move+" ms  ");
+		search_depth = new JLabel("Search depth: "+search_dept);
+		average_branching_fac = new JLabel("Average branching factor: "+average_branching_factor);
+		
+		buttonPanel.add(time_for_this_move);
+		buttonPanel.add(search_depth);
+		buttonPanel.add(average_branching_fac);
 		mainFrame.remove(plainBoard);
 		plainBoard = new PlainBoard(board);
 		mainFrame.add(plainBoard, BorderLayout.CENTER);
-		
 		mainFrame.repaint();
 		mainFrame.revalidate();
-		System.out.println("Time: "+((System.currentTimeMillis())-t1));
+//		System.out.println("Time: "+((System.currentTimeMillis())-t1));
 	}
 
 	//Min-max and alpha-beta algorithm
-	int alpha_beta(HashMap<Point, Integer> testBoard, int alpha, int beta, int depth){
-		counter++;
-				depth++;
-				System.out.println("Doing the alpha-beta "+counter);
-//		System.out.println("depth  "+depth);		
-		if(depth%2==0){
-			max=true;
+	private int alpha_beta(HashMap<Point, Integer> testBoard, int alpha, int beta, int depth){
+		if(System.currentTimeMillis()-t1<15000){
+
+			counter++;
+			depth++;
+//			System.out.println("222 max "+max+ " depthlimit "+depthLimit);
+			//				System.out.println("Doing the alpha-beta "+counter);
+//					System.out.println("depth  "+depth);		
+			if(depth%2==0){
+				max=true;
+			}
+			else{
+				max = false;
+			}
+//			System.out.println("230 max "+max+ " depth "+depth);
+			if(depth == depthLimit){
+				number_of_leaf_nodes++;
+							EvaluateBoard ev = new EvaluateBoard(testBoard, -1*color_value);
+							int evaluate_board = ev.sum;
+//							System.out.println("236 evaluation  "+evaluate_board+" color value "+color_value);
+//				int ev = (int)(Math.random()*1000);
+				//			System.out.println("ev "+ev);
+				return evaluate_board;
+
+			}
+			
+			else if(max){  // Maximazing level
+				// Generate list of moves
+				
+				color_value = 1;
+				list_of_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+				for (Map.Entry<Point, Integer> entry : testBoard.entrySet()) {
+					if(entry.getValue()==color_value || entry.getValue()==color_value+10){
+						Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
+						generate_move(testBoard, point_to_move);   
+					}
+				}
+//				System.out.println("251 size list of moves "+list_of_moves.size());
+				int max =0;
+				if(list_of_moves.size()>0){
+					max = Collections.max(list_of_moves.values());
+				}
+
+				if(max>0){
+//					list_of_moves.values().removeAll(Collections.singleton(0));
+				}
+//				System.out.println("260 size list of moves "+list_of_moves.size());
+				ArrayList<HashMap<Point, Integer>> list_of_next_moves = new ArrayList<HashMap<Point, Integer>>();
+				for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_moves.entrySet()) {
+					if(entry.getValue() == Collections.max(list_of_moves.values()))
+						list_of_next_moves.add(0, entry.getKey());
+					else{
+						list_of_next_moves.add(entry.getKey());
+					}
+				}
+				//			System.out.println("  size of list of moves "+list_of_moves.size());
+				int number_of_moves = list_of_next_moves.size();
+				int branching_factor_alpha = 0;
+				while(alpha<beta && list_of_next_moves.size()>0){
+					board_value_next = alpha_beta(list_of_next_moves.get(0), alpha, beta, depth);
+					branching_factor_alpha++;		
+					list_of_next_moves.remove(0);
+					if(board_value_next >alpha){
+						alpha = board_value_next;
+					}
+				}
+//							System.out.println("284 branching_factor_alpha  "+branching_factor_alpha+" depth "+depth+" number of moves "+number_of_moves+" depth limit "+depthLimit);
+				return alpha;
+
+
+			}
+			else if(!max){ //Minimizing level
+				// Generate list of moves
+//				moves = new ArrayList<Move>();
+//				System.out.println("291 size list of moves "+list_of_moves.size());
+				list_of_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+				color_value = -1;
+				for (Map.Entry<Point, Integer> entry : testBoard.entrySet()) {
+					if(entry.getValue()==color_value || entry.getValue()==color_value+10){
+						Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
+						generate_move(testBoard, point_to_move);   
+					}
+				}
+				
+				int max =0;
+				if(list_of_moves.size()>0){
+					max = Collections.max(list_of_moves.values());
+				}
+
+				if(max>0){
+//					list_of_moves.values().removeAll(Collections.singleton(0));
+				}
+//				System.out.println("302 size list of moves "+list_of_moves.size());
+				ArrayList<HashMap<Point, Integer>> list_of_next_moves = new ArrayList<HashMap<Point, Integer>>();
+				for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_moves.entrySet()) {
+					if(entry.getValue() == Collections.max(list_of_moves.values()))
+						list_of_next_moves.add(0, entry.getKey());
+					else{
+						list_of_next_moves.add(entry.getKey());
+					}
+				}
+//				System.out.println("318 board_value_next "+board_value_next+" beta  "+beta+" list of moves "+list_of_moves.size()+" depth "+depth);
+				int number_of_moves = list_of_next_moves.size();
+				int branching_factor_beta = 0;
+				while(alpha<beta && list_of_next_moves.size()>0){
+					branching_factor_beta++;
+//					System.out.println("320 max "+max+ " depth "+depth);
+					board_value_next = alpha_beta(list_of_next_moves.get(0), alpha, beta, depth);
+					list_of_next_moves.remove(0);
+					//				System.out.println("board_value_next "+board_value_next+" beta  "+beta+" depth "+depth);
+					if(board_value_next < beta){
+						beta = board_value_next;
+					}
+									
+				}
+//				System.out.println("330 branching_factor_beta  "+branching_factor_beta+" depth "+depth+" number of moves "+number_of_moves+" depth limit "+depthLimit );
+				return beta;
+			}
 		}
 		else{
-			max = false;
+			out_of_time = true;
 		}
-		if(depth == depthLimit){
- 
-			EvaluateBoard ev = new EvaluateBoard(testBoard, -1*color_value);
-			int evaluate_board = ev.sum;
-//			System.out.println("evaluation  "+evaluate_board+" color value "+color_value);
-			
-			return evaluate_board;
- 
-		}
-		else if(max){  // Maximazing level
-			// Generate list of moves
-			
-			color_value = 1;
-			list_of_moves = new HashMap<HashMap<Point, Integer>,Integer>();
-			for (Map.Entry<Point, Integer> entry : board.entrySet()) {
-				if(entry.getValue()==color_value || entry.getValue()==color_value+10){
-					Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
-					generate_move(testBoard, point_to_move);   
-				}
-			}
-			int max =0;
-			if(list_of_moves.size()>0){
-				max = Collections.max(list_of_moves.values());
-			}
-
-			if(max>0){
-				list_of_moves.values().removeAll(Collections.singleton(0));
-			}
-
-			ArrayList<HashMap<Point, Integer>> list_of_next_moves = new ArrayList<HashMap<Point, Integer>>();
-			for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_moves.entrySet()) {
-				if(entry.getValue() == Collections.max(list_of_moves.values()))
-					list_of_next_moves.add(0, entry.getKey());
-				else{
-					list_of_next_moves.add(entry.getKey());
-				}
-			}
-//			System.out.println("  size of list of moves "+list_of_moves.size());
-			while(alpha<beta && list_of_next_moves.size()>0){
-				board_value_next = alpha_beta(list_of_next_moves.get(0), alpha, beta, depth);
-//				System.out.println("board_value_next "+board_value_next+" alpha  "+alpha+" depth "+depth);
-				list_of_next_moves.remove(0);
-				if(board_value_next >alpha){
-					alpha = board_value_next;
-				}
-			}
-//			System.out.println(" alpha  "+alpha+" depth "+depth);
-			return alpha;
-
-
-
-			/*			for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_moves.entrySet()) {
-				JFrame mainFrame = new JFrame("Point "+entry.getKey());
-				mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-				//	mainFrame.setPreferredSize(new Dimension(820,820));
-				mainFrame.setMinimumSize(new Dimension(102*sizeVar, 86*sizeVar));
-				mainFrame.setLayout(new BorderLayout());
-				//				System.out.println("entry.getKey()  "+entry.getKey());
-				board = entry.getKey();
-
-				plainBoard = new PlainBoard(board);
-				plainBoard.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
-				mainFrame.add(plainBoard, BorderLayout.CENTER);
-				mainFrame.setVisible(true);
-
-			}
-			mainFrame.remove(plainBoard);
-			plainBoard = new PlainBoard(board);
-			mainFrame.add(plainBoard, BorderLayout.CENTER);
-			mainFrame.repaint();
-			mainFrame.revalidate();
-			 */
-		}
-		else if(!max){ //Minimizing level
-			// Generate list of moves
-			moves = new ArrayList<Move>();
-			color_value = -1;
-			for (Map.Entry<Point, Integer> entry : board.entrySet()) {
-				if(entry.getValue()==-color_value || entry.getValue()==color_value+10){
-					Point point_to_move = new Point(entry.getKey().x, entry.getKey().y);
-					generate_move(testBoard, point_to_move);   
-				}
-			}
-			int max =0;
-			if(list_of_moves.size()>0){
-				max = Collections.max(list_of_moves.values());
-			}
-
-			if(max>0){
-				list_of_moves.values().removeAll(Collections.singleton(0));
-			}
-
-			ArrayList<HashMap<Point, Integer>> list_of_next_moves = new ArrayList<HashMap<Point, Integer>>();
-			for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_moves.entrySet()) {
-				if(entry.getValue() == Collections.max(list_of_moves.values()))
-					list_of_next_moves.add(0, entry.getKey());
-				else{
-					list_of_next_moves.add(entry.getKey());
-				}
-			}
-			while(alpha<beta && list_of_next_moves.size()>0){
-				board_value_next = alpha_beta(list_of_next_moves.get(0), alpha, beta, depth);
-				list_of_next_moves.remove(0);
-//				System.out.println("board_value_next "+board_value_next+" beta  "+beta+" depth "+depth);
-				if(board_value_next < beta){
-					beta = board_value_next;
-				}
-//				System.out.println(" beta  "+beta+" depth "+depth);
-			}
-			return beta;
-		}
-		System.out.println("end alpha, beta "+alpha+", "+beta);
+//		System.out.println("end alpha, beta "+alpha+", "+beta);
 		if(max){
 			return alpha;
 		}
 		else{
 			return beta;
 		}
+
 	}
 
 	void generate_move(HashMap<Point, Integer> testBoard, Point point_to_move){
-
+		
 		next_move = new Move(testBoard, color_value, point_to_move, second_move);
-		if(next_move.move_value>0){
-			second_move=true;
-		}
-
+		
+//		System.out.println("next move values "+next_move.move_value);
 
 		boolean[] move_direction = {next_move.left, next_move.right, next_move.back_left, next_move.back_right};
+		boolean[] move_direction_capture = {next_move.left_capture, next_move.right_capture, next_move.back_left_capture, next_move.back_right_capture};
 		Point[] point_moved_to = {next_move.point_moved_to_left, next_move.point_moved_to_right, next_move.point_moved_to_back_left, next_move.point_moved_to_back_right};
 		HashMap[] configuration = {next_move.configuration_left, next_move.configuration_right, next_move.configuration_back_left, next_move.configuration_back_right};
 
 		for(int i=0; i<4; i++){
-			if(move_direction[i] && next_move.move_value == 0 && !second_move){
+			if(move_direction[i] && !second_move ){ //next_move.move_value == 0 && ){
 				list_of_moves.put(configuration[i], next_move.move_value);
 				second_move=false;
+//				System.out.println("360 size list of moves "+list_of_moves.size());
 			}
-			else if(!next_move.left && !next_move.right && !next_move.back_left && !next_move.back_right && second_move){
+			else if(move_direction_capture[i]){ /// && second_move){
 				//				System.out.println("put to list i  "+i+",   "+configuration[i]);
-				list_of_moves.put(testBoard, move_value);
+				move_value++;
+				list_of_moves.put(configuration[i], move_value);
 				move_value = 0;
 				second_move = false;
+//				System.out.println("368 size list of moves "+list_of_moves.size());
 			}
-			else if(move_direction[i] && next_move.move_value>0){
+			 if(move_direction_capture[i]){ // && next_move.move_value>0){
 				move_value++;
 				second_move=true;
 				testBoard =new HashMap<Point, Integer>();
 				testBoard.putAll(configuration[i]);
 
-				//				System.out.println("test board "+testBoard);
+//								System.out.println("test board "+testBoard);
 				generate_move(testBoard, point_moved_to[i]);
 			}
-
 		}
+		second_move=false;
+		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_moves.entrySet()) {
+			if(entry.getValue() >0){
+//				System.out.println("move values "+entry.getValue()+" move "+entry.getKey());
+			}
+			
+		}
+//		System.out.println("386 size list of moves "+list_of_moves.size());
 	}
 
 
@@ -358,30 +458,7 @@ public class Play {
 			}
 		}
 
-/*			board.put(new Point(2,2), 1+10);
-		board.put(new Point(1,3), -1);
-		board.put(new Point(0,6), 99);
-		board.put(new Point(2,6), 99);
-		board.put(new Point(3,3), -1);
-		board.put(new Point(1,5), -1);
 
-		
-		board.put(new Point(4,4), -1);
-		board.put(new Point(4,2), 99);
-		board.put(new Point(2,4), 1);
-		board.put(new Point(3,5), 99);
-
-
-	 board.put(new Point(2,2), 1+10);
-		 board.put(new Point(1,3), -1);
-		 board.put(new Point(0,6), 99);
-		 board.put(new Point(2,6), 99);
-		 board.put(new Point(3,3), -1);
-		 board.put(new Point(1,5), 99);
-		 board.put(new Point(1,5), -1);
-		 board.put(new Point(6,4), 1);
-		 board.put(new Point(6,2), 99);*/
-//		EvaluateBoard evaluatedBoard = new EvaluateBoard( board, color_value) ;
 
 	}
 
@@ -411,16 +488,19 @@ public class Play {
 				System.out.println("Quiet!!   I am thinking......");
 				t1 = System.currentTimeMillis();
 				board = plainBoard.configuration;
+				depthLimit=0;
 				next_move();
 			}
 		});
 
-		JPanel buttonPanel = new JPanel();
+		
+		
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		buttonPanel.add(new_game);
 		buttonPanel.add(add_piece);
 		buttonPanel.add(start_game);
 		buttonPanel.add(move_on);
+		buttonPanel.add(time_for_this_move);
 		mainFrame.add(buttonPanel, BorderLayout.EAST);
 	}
 

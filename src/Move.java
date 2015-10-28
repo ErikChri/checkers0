@@ -15,7 +15,7 @@ public class Move {
 	Point captured_piece;
 	ArrayList<Point> captured_pieces = new ArrayList<Point>();
 	int move_value;
-	boolean second_move, left, right,  back_left, back_right, is_king;
+	boolean second_move, left, right,  back_left, back_right, is_king, back_left_capture,back_right_capture, left_capture, right_capture;
 	int color_value;
 	int move_direction; // = -1;
 	
@@ -81,7 +81,8 @@ public class Move {
 			if(configuration_left.containsKey(point_moved_to_left) && configuration_left.get(point_moved_to_left)==99){
 				captured_piece = new Point(point_to_move.x-1, point_to_move.y+color_value);
 				captured_pieces.add(captured_piece);
-				left = true;
+				left_capture = true;
+				left = false;
 				move_value++;
 				configuration_left.put(captured_piece, 99);
 				configuration_left.put(point_to_move, 99);
@@ -103,6 +104,7 @@ public class Move {
 				right = true;  
 			}
 			
+			
 		}
 		else if(configuration_right.containsKey(point_moved_to_right) && configuration_right.get(point_moved_to_right)==-1*color_value){
 
@@ -111,9 +113,10 @@ public class Move {
 				captured_piece = new Point(point_to_move.x+1, point_to_move.y+color_value);
 				captured_pieces.add(captured_piece);
 				if(move_value == 0){
-					left = false;
+					
 				}
-				right = true;
+				left = right = false;
+				right_capture = true;
 				move_value++;
 				configuration_right.put(captured_piece, 99);
 				configuration_right.put(point_to_move, 99);
@@ -144,9 +147,9 @@ public class Move {
 					captured_piece = new Point(point_to_move.x-1, point_to_move.y-color_value);
 					captured_pieces.add(captured_piece);
 					if(move_value>0){
-						right = false;
+						right = left = back_left = false;
 					}
-					back_left = true;
+					back_left_capture = true;
 					move_value++;
 					configuration_back_left.put(captured_piece, 99);
 					configuration_back_left.put(point_to_move, 99);
@@ -160,7 +163,7 @@ public class Move {
 				configuration_back_right.put(point_to_move, 99);
 				configuration_back_right.put(point_moved_to_back_right, color_value);
 				if(move_value>0){
-					back_right = false;
+					back_right = right = left = back_left = false;
 				}
 				else{
 					back_right = true;
@@ -173,10 +176,14 @@ public class Move {
 				if(configuration_back_right.containsKey(point_moved_to_back_right) && configuration_back_right.get(point_moved_to_back_right)==99){
 					captured_piece = new Point(point_to_move.x+1, point_to_move.y-color_value);
 					captured_pieces.add(captured_piece);
-					if(move_value == 0){
+				/*	if(move_value == 0 && !back_left_king){
 						right = left = back_left = false;
 					}
-					back_right = true;
+					else{
+						right = left = false;
+					}*/
+					back_right = right = left = back_left = false;
+					back_right_capture = true;
 					move_value++;
 					configuration_back_right.put(captured_piece, 99);
 					configuration_back_right.put(point_to_move, 99);
@@ -199,12 +206,12 @@ public class Move {
 		for (Map.Entry<Point, Integer> entry : configuration_back_up.entrySet()) {
 			if(entry.getValue()>1 && entry.getValue()<99 && configuration_restore.get(entry.getKey()) != 99 ){     //System.out.println("restore "+entry.getKey()+",  "+ entry.getValue()+", restore "+configuration_restore.get(entry.getKey()));
 				configuration_restore.put(entry.getKey(), entry.getValue()); 
-				if(configuration_restore == configuration_right){
-					//					System.out.println("restore kings "+configuration_restore.get(entry.getKey())+ ",    right "+configuration_right.get(entry.getKey()));
-				}
-
+				
 			}
 		}
+		if(configuration_restore.containsKey(moved_to) && configuration_restore.get(moved_to) == 1 && moved_to.y == 7){
+			configuration_restore.put(moved_to, 1+10);
+				}
 		if(is_king){
 //						System.out.println("restore pre "+configuration_restore.get(moved_to)+" point "+moved_to+",   point to move "+point_to_move);
 			configuration_restore.put(moved_to, color_value+10); 
