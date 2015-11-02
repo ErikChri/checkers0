@@ -21,10 +21,12 @@ public class PlainBoard extends JPanel implements MouseListener{
 	Point to_move;
 	Point move_to;
 	Point captured_piece;
+	int piece_color = 1;
 	
 	int color_value;
-	public PlainBoard(HashMap<Point, Integer> configuration){
+	public PlainBoard(HashMap<Point, Integer> configuration, int piece_color){
 		this.configuration = configuration;
+		this.piece_color = piece_color;
 		
 		addMouseListener(this);
 		
@@ -39,10 +41,10 @@ public class PlainBoard extends JPanel implements MouseListener{
 	    
 	    Color gold = new Color(255,165,0);
 	    Color black = new Color(0,0,0);
-	    Color white = new Color(155,0,180);
+	    Color white = new Color(100,0,180);
 	    
 	    // Create plain board
-	    Color grey = Color.gray;
+	    Color grey = new Color(170,170,170); //.gray;
 	    Color red = Color.red;
 	    g2.setColor(Color.black); 
 	    g2.setStroke(new BasicStroke(2));
@@ -66,22 +68,22 @@ public class PlainBoard extends JPanel implements MouseListener{
 	    
 	    // Put pieces on board
 	    for (Map.Entry<Point, Integer> entry : configuration.entrySet()) {
-	    	if(entry.getValue()==1){
+	    	if(entry.getValue()==piece_color){
 	    		g2.setColor(black);
 	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    	}
-	    	else if(entry.getValue()==-1){
+	    	else if(entry.getValue()==-piece_color){
 	    		g2.setColor(white);
 	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    	}
-	    	else if(entry.getValue()==11){
+	    	else if(entry.getValue()==piece_color+10){
 	    		g2.setColor(black);
 	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    		g2.setStroke(new BasicStroke(5));
 	    		g2.setColor(gold);
 	    		g2.drawOval(entry.getKey().x*10*sizeVar+8, entry.getKey().y*10*sizeVar+8, 7*sizeVar, 7*sizeVar);
 	    	}
-	    	else if(entry.getValue()==9){
+	    	else if(entry.getValue()==-piece_color+10){
 	    		g2.setColor(white);
 	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
 	    		g2.setStroke(new BasicStroke(5));

@@ -29,6 +29,8 @@ public class Play1 {
 	static int mov_no = 0;
 	JFrame mainFrame = new JFrame("Checkers");
 	PlainBoard plainBoard;
+	int no_simple_moves = 0;
+	int piece_color = 1;
 	//	Board board;
 
 	// Alpha-beta variables
@@ -53,7 +55,7 @@ public class Play1 {
 	int sizeVar = 5;
 	int move_value = 0;
 	int capture_value = 0;
-	int color_value =1;
+	int color_value = 1;
 	int mover;
 	int move_direction = -1;
 	Move next_move;
@@ -72,7 +74,7 @@ public class Play1 {
 	ArrayList<HashMap<Point, Integer>> previous_boards = new ArrayList<HashMap<Point, Integer>>();
 
 	//Buttons
-	JButton new_game = new JButton("New Game");
+	JButton change_side = new JButton("change_side");
 	JButton add_piece = new JButton("Add Piece");
 	JButton start_game = new JButton("Start Game");
 	JButton move_on = new JButton("Next Move");
@@ -90,14 +92,14 @@ public class Play1 {
 		mainFrame.setMinimumSize(new Dimension(125*sizeVar, 88*sizeVar));
 		mainFrame.setLayout(new BorderLayout());
 		//		board = new Board();
-		plainBoard = new PlainBoard(board);
+		plainBoard = new PlainBoard(board, piece_color);
 		plainBoard.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
 		mainFrame.add(plainBoard, BorderLayout.CENTER);
 		mainFrame.setVisible(true);
 
 		addButtons();
 		start_position_board();
-		next_move();
+//		next_move();
 
 
 	}
@@ -171,7 +173,7 @@ public class Play1 {
 		if(new_frame){
 			JFrame previousMove = new JFrame("Previous move");
 			previousMove.setLocation(x, y);
-			PlainBoard plainBoard_p = new PlainBoard(board);
+			PlainBoard plainBoard_p = new PlainBoard(board, piece_color);
 			previousMove.add(plainBoard_p, BorderLayout.CENTER);
 			previousMove.setMinimumSize(new Dimension(125*sizeVar, 88*sizeVar));
 			previousMove.setVisible(true);
@@ -191,7 +193,7 @@ public class Play1 {
 			buttonPanel.add(search_depth);
 			buttonPanel.add(average_branching_fac);
 
-			plainBoard = new PlainBoard(board);
+			plainBoard = new PlainBoard(board, piece_color);
 			mainFrame.add(plainBoard, BorderLayout.CENTER);
 			mainFrame.repaint();
 			mainFrame.revalidate();
@@ -246,7 +248,7 @@ public class Play1 {
 				return alpha;
 			}
 			else if(!is_alpha_node){ 
-				color_value = -1;
+				color_value = 1;
 				MoveGenerator next_move = new MoveGenerator(testBoard, color_value);
 				System.out.println("212 moves size "+next_move.moves.size());
 				if(!(testBoard.containsValue(color_value) || testBoard.containsValue(color_value+10))){
@@ -296,6 +298,7 @@ public class Play1 {
 
 
 	void start_position_board(){
+		System.out.println("300 change side");
 		board = new HashMap<Point, Integer>();
 		int value = 1;
 		for(int i=0; i<8; i++){
@@ -325,10 +328,7 @@ public class Play1 {
 					}
 				}
 			}
-			if(i==3){
-				value = -1;
-
-			}
+			
 			if(i>4){
 				value = -1;
 				if(i%2==0){
@@ -347,20 +347,12 @@ public class Play1 {
 
 	void addButtons(){
 
-		add_piece.addActionListener(new ActionListener() {
+		start_game.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent ev) {
 
-				String s = (String)JOptionPane.showInputDialog(
-						null,
-						"State color and position (separate by comma)" ,
-						"Add a Piece to the Board",
-						JOptionPane.PLAIN_MESSAGE,
-						null,
-						null,
-						null);
-				System.out.println(s);
+				next_move();
 			}
 		});
 
@@ -376,12 +368,29 @@ public class Play1 {
 			}
 		});
 
+		change_side.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent ev) {
+
+				piece_color = -1*piece_color;
+				start_position_board();
+				buttonPanel.remove(time_for_this_move);
+				buttonPanel.remove(search_depth);
+				buttonPanel.remove(average_branching_fac);
+				mainFrame.remove(plainBoard);
+				plainBoard = new PlainBoard(board, piece_color);
+				mainFrame.add(plainBoard, BorderLayout.CENTER);
+				mainFrame.repaint();
+				mainFrame.revalidate();
+				
+			}
+		});
 
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-		//		buttonPanel.add(new_game);
+				buttonPanel.add(change_side);
 		//		buttonPanel.add(add_piece);
-		//		buttonPanel.add(start_game);
+				buttonPanel.add(start_game);
 		buttonPanel.add(move_on);
 		buttonPanel.add(time_for_this_move);
 		mainFrame.add(buttonPanel, BorderLayout.EAST);

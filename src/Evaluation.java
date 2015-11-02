@@ -12,15 +12,15 @@ public class Evaluation {
 		this.color_value = color_value1;
 		this.mover = mover;
 		for (Map.Entry<Point, Integer> entry : inputBoard.entrySet()) {
-			if(entry.getValue()==1){
+			if(entry.getValue()==color_value){
 				sum++;
 			}
-			else if(entry.getValue() == 11){
+			else if(entry.getValue() == color_value+10){
 				sum+=1000;
-			}else if(entry.getValue() == -1){
+			}else if(entry.getValue() == -1*color_value){
 				sum--;
 			}
-			else if(entry.getValue() == 9){
+			else if(entry.getValue() == -1*color_value+10){
 				sum-=1000;
 			}
 		}

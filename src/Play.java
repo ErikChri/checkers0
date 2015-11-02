@@ -86,7 +86,7 @@ public class Play {
 		mainFrame.setMinimumSize(new Dimension(125*sizeVar, 88*sizeVar));
 		mainFrame.setLayout(new BorderLayout());
 		//		board = new Board();
-		plainBoard = new PlainBoard(board);
+//		plainBoard = new PlainBoard(board);
 		plainBoard.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
 		mainFrame.add(plainBoard, BorderLayout.CENTER);
 		mainFrame.setVisible(true);
@@ -253,9 +253,9 @@ list_of_best_moves.put(choose_next_move.get(i), v);
 			mainFrame1.setLayout(new BorderLayout());
 			mainFrame1. setLocation(800, 100);
 			//		board = new Board();
-			PlainBoard plainBoard1 = new PlainBoard((HashMap<Point, Integer>) move_queu[k][1]);
-			plainBoard1.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
-			mainFrame1.add(plainBoard1, BorderLayout.CENTER);
+//			PlainBoard plainBoard1 = new PlainBoard((HashMap<Point, Integer>) move_queu[k][1]);
+//			plainBoard1.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
+//			mainFrame1.add(plainBoard1, BorderLayout.CENTER);
 			//				mainFrame1.setVisible(true);
 		}
 
@@ -282,9 +282,9 @@ list_of_best_moves.put(choose_next_move.get(i), v);
 			mainFrame1.setLayout(new BorderLayout());
 			mainFrame1. setLocation(600, 200);
 			//		board = new Board();
-			PlainBoard plainBoard1 = new PlainBoard((HashMap<Point, Integer>) move_queu[k][1]);
-			plainBoard1.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
-			mainFrame1.add(plainBoard1, BorderLayout.CENTER);
+//			PlainBoard plainBoard1 = new PlainBoard((HashMap<Point, Integer>) move_queu[k][1]);
+//			plainBoard1.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
+//			mainFrame1.add(plainBoard1, BorderLayout.CENTER);
 			mainFrame1.setVisible(true);
 			if(depthLimit == 20){			}
 		}
@@ -319,7 +319,7 @@ list_of_best_moves.put(choose_next_move.get(i), v);
 		buttonPanel.add(search_depth);
 		buttonPanel.add(average_branching_fac);
 
-		plainBoard = new PlainBoard(board);
+//		plainBoard = new PlainBoard(board);
 		mainFrame.add(plainBoard, BorderLayout.CENTER);
 		mainFrame.repaint();
 		mainFrame.revalidate();
