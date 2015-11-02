@@ -12,21 +12,39 @@ public class Evaluation {
 		this.color_value = color_value1;
 		this.mover = mover;
 		for (Map.Entry<Point, Integer> entry : inputBoard.entrySet()) {
-			color_value = 1;
-			if(entry.getValue() != 99){ // == color_value || entry.getValue() == color_value +10){}
-				sum+=entry.getValue();
-				if(entry.getValue()==9){
-					sum-=20;
+			if(entry.getValue()==1){
+				sum++;
+			}
+			else if(entry.getValue() == 11){
+				sum+=1000;
+			}else if(entry.getValue() == -1){
+				sum--;
+			}
+			else if(entry.getValue() == 9){
+				sum-=1000;
+			}
+		}
+	}
+}
+/*			color_value = 1;
+			if(entry.getValue()==11){
+				sum+=300;
+			}
+			if(entry.getValue() == 1) { //!= 99){ // == color_value || entry.getValue() == color_value +10){}
+				sum+=  1000;  //entry.getValue();
+				
+				if(entry.getValue()==9|| entry.getValue()== -1){
+					sum-=500;
 				}
 			}
-
-			if((entry.getValue()== color_value || entry.getValue()== color_value+10) && mover != color_value){
+	
+			if((entry.getValue()== color_value || entry.getValue()== color_value+10)){ // && mover != color_value){
 				color_value = 1;
 				int isCapt = CanBeCaptured(entry.getKey(), inputBoard, 0);
-				sum-= 20*isCapt;
+				sum-= 8000*isCapt;
 //				System.out.println("27 isCapt: "+ isCapt+" point "+entry.getKey());
 				if(color_value == mover && isCapt>0){
-					sum+= 10*color_value;
+//					sum+= 10*color_value;
 //					System.out.println("3 isCapt: "+ isCapt+" point "+entry.getKey());
 				}
 			}
@@ -41,13 +59,13 @@ public class Evaluation {
 				}
 			}
 
+/*
 
-
-/*			int capt = checkIfCaptures(entry.getKey(), inputBoard, 0);
+		int capt = checkIfCaptures(entry.getKey(), inputBoard, 0);
 			sum+= 20*capt*color_value*mover;
 			if((isCapt==0 || color_value == mover) && capt>0){
 				sum+= 10*color_value*mover;
-			}*/
+			}
 		}
 	}
 
@@ -55,7 +73,6 @@ public class Evaluation {
 		if(inputBoard.containsKey(new Point(entryPosition.x+color_value, entryPosition.y+color_value)) && inputBoard.containsKey(new Point(entryPosition.x-color_value, entryPosition.y-color_value)) && (inputBoard.get(new Point(entryPosition.x+color_value, entryPosition.y+color_value)) == -1*color_value || inputBoard.get(new Point(entryPosition.x+color_value, entryPosition.y+color_value))==-1*color_value+10)  && inputBoard.get(new Point(entryPosition.x-color_value, entryPosition.y-color_value))==99){
 			val++;
 //			System.out.println("57 val: "+ val+" point "+entryPosition+" point in front "+(new Point(entryPosition.x+color_value,entryPosition.y+color_value))+" point value in front "+inputBoard.get(new Point(entryPosition.x+color_value, entryPosition.y+color_value)));
-				
 		}
 		if(inputBoard.containsKey(new Point(entryPosition.x-color_value, entryPosition.y+color_value)) && inputBoard.containsKey(new Point(entryPosition.x+color_value, entryPosition.y-color_value)) && (inputBoard.get(new Point(entryPosition.x-color_value, entryPosition.y+color_value))==-1*color_value || inputBoard.get(new Point(entryPosition.x-color_value, entryPosition.y+color_value))==-1*color_value+10)  && inputBoard.get(new Point(entryPosition.x+color_value, entryPosition.y-color_value))==99){
 			val++;
@@ -69,8 +86,13 @@ public class Evaluation {
 			val++;
 //			System.out.println("69 val: "+ val+" point "+entryPosition);
 		}
+		if(val>0){
+			val = 1;
+		}
 		return val;
 	}
+	
+	
 	public int checkIfCaptures(Point entryPosition, HashMap<Point, Integer> inputBoard, int val) {
 		if(inputBoard.containsKey(new Point(entryPosition.x+2*color_value, entryPosition.y+2*color_value)) && (inputBoard.get(new Point(entryPosition.x+color_value, entryPosition.y+color_value))==-1*color_value || inputBoard.get(new Point(entryPosition.x+color_value, entryPosition.y+color_value))==-1*color_value+10)  && inputBoard.get(new Point(entryPosition.x+2*color_value, entryPosition.y+2*color_value))==99){
 			val++;
@@ -87,3 +109,4 @@ public class Evaluation {
 		return val;
 	}
 }
+*/

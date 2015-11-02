@@ -212,6 +212,9 @@ public class Move {
 		if(configuration_restore.containsKey(moved_to) && configuration_restore.get(moved_to) == 1 && moved_to.y == 7){
 			configuration_restore.put(moved_to, 1+10);
 				}
+		else if(configuration_restore.containsKey(moved_to) && configuration_restore.get(moved_to) == -1 && moved_to.y == 0){
+			configuration_restore.put(moved_to, 9);
+		}
 		if(is_king){
 //						System.out.println("restore pre "+configuration_restore.get(moved_to)+" point "+moved_to+",   point to move "+point_to_move);
 			configuration_restore.put(moved_to, color_value+10); 
