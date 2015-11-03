@@ -1,6 +1,7 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -22,11 +23,13 @@ public class PlainBoard extends JPanel implements MouseListener{
 	Point move_to;
 	Point captured_piece;
 	int piece_color = 1;
+	String msg = "";
 	
 	int color_value;
-	public PlainBoard(HashMap<Point, Integer> configuration, int piece_color){
+	public PlainBoard(HashMap<Point, Integer> configuration, int piece_color, String msg){
 		this.configuration = configuration;
 		this.piece_color = piece_color;
+		this.msg = msg;
 		
 		addMouseListener(this);
 		
@@ -38,7 +41,6 @@ public class PlainBoard extends JPanel implements MouseListener{
 	             RenderingHints.KEY_TEXT_ANTIALIASING,
 	             RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 	    g2.setRenderingHints(rh);
-	    
 	    Color gold = new Color(255,165,0);
 	    Color black = new Color(0,0,0);
 	    Color white = new Color(100,0,180);
@@ -65,7 +67,7 @@ public class PlainBoard extends JPanel implements MouseListener{
 	    		g2.fillRect(10*sizeVar*i, 10*sizeVar*j, 10*sizeVar, 10*sizeVar);
 	    	}
 	    }
-	    
+	   
 	    // Put pieces on board
 	    for (Map.Entry<Point, Integer> entry : configuration.entrySet()) {
 	    	if(entry.getValue()==piece_color){
@@ -90,7 +92,11 @@ public class PlainBoard extends JPanel implements MouseListener{
 	    		g2.setColor(gold);
 	    		g2.drawOval(entry.getKey().x*10*sizeVar+8, entry.getKey().y*10*sizeVar+8, 7*sizeVar, 7*sizeVar);
 	    	}
+	    	
 	    }
+	    g2.setColor(black);
+	    g2.setFont(new Font("TimesRoman", Font.BOLD, 30)); 
+	    g2.drawString(msg, 25, 200);
 	}
 
 	@Override

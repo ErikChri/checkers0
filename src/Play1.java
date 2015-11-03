@@ -31,6 +31,8 @@ public class Play1 {
 	PlainBoard plainBoard;
 	int no_simple_moves = 0;
 	int piece_color = 1;
+	int fifty_moves_counter = 0;
+	String msg = "";
 	//	Board board;
 
 	// Alpha-beta variables
@@ -64,7 +66,7 @@ public class Play1 {
 	HashMap<Point, Integer> board;
 	//	HashMap<Point, Point> move;
 	HashMap<HashMap<Point, Integer>, Integer> list_of_moves = new HashMap<HashMap<Point, Integer>,Integer>();
-//	HashHashMap<Point, Integer>, Integer> list_of_best_moves = new HashMap<HashMap<Point, Integer>,Integer>();
+	//	HashHashMap<Point, Integer>, Integer> list_of_best_moves = new HashMap<HashMap<Point, Integer>,Integer>();
 	HashMap<Point, Integer> preliminary_board = new HashMap<Point, Integer>();
 	ArrayList<HashMap<Point, Integer>> choose_next_move = new ArrayList<HashMap<Point, Integer>>();
 	ArrayList<HashMap<Point, Integer>>temp_choose_next_move = new ArrayList<HashMap<Point, Integer>>();
@@ -74,10 +76,10 @@ public class Play1 {
 	ArrayList<HashMap<Point, Integer>> previous_boards = new ArrayList<HashMap<Point, Integer>>();
 
 	//Buttons
-	JButton change_side = new JButton("change_side");
+	JButton change_side = new JButton("change side");
 	JButton add_piece = new JButton("Add Piece");
 	JButton start_game = new JButton("Start Game");
-	JButton move_on = new JButton("Next Move");
+	JButton move_on = new JButton("Start game/Next Move");
 	JLabel time_for_this_move = new JLabel("Time for this move: "+time_for_move+" ms  ");
 	JLabel search_depth = new JLabel("Search depth: "+1);
 	JLabel average_branching_fac = new JLabel("Average branching factor: "+branching_factor);
@@ -92,14 +94,14 @@ public class Play1 {
 		mainFrame.setMinimumSize(new Dimension(125*sizeVar, 88*sizeVar));
 		mainFrame.setLayout(new BorderLayout());
 		//		board = new Board();
-		plainBoard = new PlainBoard(board, piece_color);
+		plainBoard = new PlainBoard(board, piece_color, msg);
 		plainBoard.setMinimumSize(new Dimension(80*sizeVar,80*sizeVar));
 		mainFrame.add(plainBoard, BorderLayout.CENTER);
 		mainFrame.setVisible(true);
 
 		addButtons();
 		start_position_board();
-//		next_move();
+		//		next_move();
 
 
 	}
@@ -110,10 +112,14 @@ public class Play1 {
 
 
 		if(!board.containsValue(-1) && !board.containsValue(9)){
-			System.out.println("Black wins the game");
+			msg = "Black wins the game";
+			show(board, 0, 0, false);
+//			System.out.println("Black wins the game");
 		}
 		if(!board.containsValue(1) && !board.containsValue(11)){
-			System.out.println("White wins the game");
+			msg = "Opponent wins the game";
+			show(board, 0, 0, false);
+//			System.out.println("Opponent wins the game");
 		}
 
 		while(!out_of_time){
@@ -128,7 +134,6 @@ public class Play1 {
 			depthLimit++;
 			color_value = 1;
 			MoveGenerator next_move = new MoveGenerator(board, color_value);
-			//		System.out.println("116 moves size "+next_move.moves.size());
 			move_queue = new Object[next_move.moves.size()][2];
 			for(int i=0; i<move_queue.length; i++){
 				move_queue[i][1] = -1000000;
@@ -138,7 +143,6 @@ public class Play1 {
 			int j_inverse = move_queue.length-1;
 			for (int i=0; i<next_move.moves.size(); i++) {
 				int v = alpha_beta(next_move.moves.get(i), alpha, beta, false, 1);
-				System.out.println("124 alpha "+v);
 				if(v >alpha){
 					alpha = v;
 					int j = 0;
@@ -155,6 +159,7 @@ public class Play1 {
 				}
 			}
 		}
+		
 		board = preliminary_board;
 		previous_boards.add(0, board);
 		show(board, 0, 0, false);
@@ -162,10 +167,38 @@ public class Play1 {
 			show(previous_boards.get(1), 700, 100, true);
 		}
 
+		fifty_moves_check();
 
 	}
 
-
+	int fifty_moves_check(){
+		int number_of_blanks = 0;
+		int number_of_blanks_prev = 0;
+		if(previous_boards.size()>1){
+			for (Map.Entry<Point, Integer> entry : board.entrySet()) {
+				if((entry.getValue() == 1 || entry.getValue() == -1) && entry.getValue() == previous_boards.get(1).get(entry.getKey())){
+					return fifty_moves_counter = 0;
+				}
+				if(entry.getValue() == 99){
+					number_of_blanks++;
+				}
+				if(previous_boards.get(1).get(entry.getKey()) == 99){
+					number_of_blanks_prev++;
+				}
+			}
+		}
+		if(number_of_blanks != number_of_blanks_prev){
+			return fifty_moves_counter = 0;
+		}
+		else{
+			fifty_moves_counter++;
+			if(fifty_moves_counter == 50){
+				msg = "The game is a draw!";
+				show(board, 0, 0, false);
+			}
+			return fifty_moves_counter;
+		}
+	}
 
 	void show(HashMap<Point, Integer> board, int x, int y, boolean new_frame){
 		t2 = System.currentTimeMillis();
@@ -173,7 +206,7 @@ public class Play1 {
 		if(new_frame){
 			JFrame previousMove = new JFrame("Previous move");
 			previousMove.setLocation(x, y);
-			PlainBoard plainBoard_p = new PlainBoard(board, piece_color);
+			PlainBoard plainBoard_p = new PlainBoard(board, piece_color, msg);
 			previousMove.add(plainBoard_p, BorderLayout.CENTER);
 			previousMove.setMinimumSize(new Dimension(125*sizeVar, 88*sizeVar));
 			previousMove.setVisible(true);
@@ -193,18 +226,20 @@ public class Play1 {
 			buttonPanel.add(search_depth);
 			buttonPanel.add(average_branching_fac);
 
-			plainBoard = new PlainBoard(board, piece_color);
+			plainBoard = new PlainBoard(board, piece_color, msg);
 			mainFrame.add(plainBoard, BorderLayout.CENTER);
 			mainFrame.repaint();
 			mainFrame.revalidate();
-			//				System.out.println("249 Time: "+((System.currentTimeMillis())-t1));
+			if(!msg.equals("")){
+				return;
+			}
 		}
 	}
 
 	//Min-max and alpha-beta algorithm
 	private int alpha_beta(HashMap<Point, Integer> testBoard, int alpha, int beta, boolean is_alpha_node, int depth){
 		board_seen_before.removeAll(board_seen_before);
-		if(System.currentTimeMillis()-t1>14999){
+		if(System.currentTimeMillis()-t1>1499){
 			out_of_time=true;
 		}
 		if(!out_of_time){
@@ -218,7 +253,6 @@ public class Play1 {
 			else if(is_alpha_node){  
 				color_value = 1;
 				MoveGenerator next_move = new MoveGenerator(testBoard, color_value);
-				System.out.println("183 moves size "+next_move.moves.size());
 				if(!(testBoard.containsValue(color_value) || testBoard.containsValue(color_value+10))){
 					number_of_leaf_nodes++;
 					return -100000;
@@ -232,7 +266,7 @@ public class Play1 {
 					return -100000;
 				}
 
-				while(alpha<beta && next_move.moves.size()>0){ // && System.currentTimeMillis()-t1<15000){
+				while(alpha<beta && next_move.moves.size()>0){ 
 					if(!board_seen_before.contains(next_move.moves.get(0))){
 						board_seen_before.add(next_move.moves.get(0));
 						HashMap<Point, Integer> next_testboard = new HashMap<Point, Integer>();
@@ -248,9 +282,8 @@ public class Play1 {
 				return alpha;
 			}
 			else if(!is_alpha_node){ 
-				color_value = 1;
+				color_value = -1;
 				MoveGenerator next_move = new MoveGenerator(testBoard, color_value);
-				System.out.println("212 moves size "+next_move.moves.size());
 				if(!(testBoard.containsValue(color_value) || testBoard.containsValue(color_value+10))){
 					number_of_leaf_nodes++;
 					return 100000;
@@ -264,14 +297,12 @@ public class Play1 {
 					return 100000;
 				}
 
-				while(alpha<beta && next_move.moves.size()>0){ // && System.currentTimeMillis()-t1<15000){
-					System.out.println("219 alpha beta "+alpha+ ", "+beta);
+				while(alpha<beta && next_move.moves.size()>0){ 
 					if(!board_seen_before.contains(next_move.moves.get(0))){
 						board_seen_before.add(next_move.moves.get(0));
 						HashMap<Point, Integer> next_testboard = new HashMap<Point, Integer>();
 						next_testboard.putAll(next_move.moves.get(0));
 						board_value_next = alpha_beta(next_testboard, alpha, beta, true, depth+1);
-						System.out.println("230 board_value_next "+board_value_next);
 						number_of_branches++;
 						if(board_value_next < beta){
 							beta= board_value_next;
@@ -279,7 +310,6 @@ public class Play1 {
 					}
 					next_move.moves.remove(0);
 				}
-				System.out.println("233 return beta "+beta+", depth "+depth);
 				return beta;
 
 
@@ -298,7 +328,6 @@ public class Play1 {
 
 
 	void start_position_board(){
-		System.out.println("300 change side");
 		board = new HashMap<Point, Integer>();
 		int value = 1;
 		for(int i=0; i<8; i++){
@@ -328,7 +357,7 @@ public class Play1 {
 					}
 				}
 			}
-			
+
 			if(i>4){
 				value = -1;
 				if(i%2==0){
@@ -351,7 +380,6 @@ public class Play1 {
 
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-
 				next_move();
 			}
 		});
@@ -360,7 +388,6 @@ public class Play1 {
 
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-				System.out.println("Quiet!!   I am thinking......");
 				t1 = System.currentTimeMillis();
 				board = plainBoard.configuration;
 				depthLimit=0;
@@ -379,18 +406,17 @@ public class Play1 {
 				buttonPanel.remove(search_depth);
 				buttonPanel.remove(average_branching_fac);
 				mainFrame.remove(plainBoard);
-				plainBoard = new PlainBoard(board, piece_color);
+				plainBoard = new PlainBoard(board, piece_color, msg);
 				mainFrame.add(plainBoard, BorderLayout.CENTER);
 				mainFrame.repaint();
 				mainFrame.revalidate();
-				
+
 			}
 		});
 
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-				buttonPanel.add(change_side);
-		//		buttonPanel.add(add_piece);
-				buttonPanel.add(start_game);
+		buttonPanel.add(change_side);
+//		buttonPanel.add(start_game);
 		buttonPanel.add(move_on);
 		buttonPanel.add(time_for_this_move);
 		mainFrame.add(buttonPanel, BorderLayout.EAST);
