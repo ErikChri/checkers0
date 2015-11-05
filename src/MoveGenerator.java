@@ -8,7 +8,7 @@ import java.util.Map;
 public class MoveGenerator {
 	
 	ArrayList<HashMap<Point, Integer>> moves = new ArrayList<HashMap<Point, Integer>>();
-	
+	int move_value = 0;
 	HashMap<Point, Integer> inputBoard = new HashMap<Point, Integer>();
 	Move next_move;
 	int color_value;
@@ -30,7 +30,7 @@ public class MoveGenerator {
 
 	void generate_move(HashMap<Point, Integer> testBoard, Point point_to_move, boolean second_move){
 
-		int move_value = 0;
+		
 		next_move = new Move(testBoard, color_value, point_to_move, second_move);
 
 		boolean[] move_direction = {next_move.left, next_move.right, next_move.back_left, next_move.back_right};
@@ -62,6 +62,15 @@ public class MoveGenerator {
 		if(list_of_moves.size()>0){
 			max = Collections.max(list_of_moves.values());
 		}
+		
+		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_moves.entrySet()) {
+			if(entry.getValue() == Collections.max(list_of_moves.values())){
+				moves.add(0, entry.getKey());
+			}
+		}
+		
+		
+/*		
 		int i = 0;
 		while(max>i){
 			list_of_moves.values().removeAll(Collections.singleton(i));
@@ -69,12 +78,14 @@ public class MoveGenerator {
 		}
 		
 		for (Map.Entry<HashMap<Point, Integer>, Integer> entry : list_of_moves.entrySet()) {
-			if(entry.getValue() == Collections.max(list_of_moves.values()))
+			if(entry.getValue() == Collections.max(list_of_moves.values())){
 				moves.add(0, entry.getKey());
+			}
+				
 			else{
 				moves.add(entry.getKey());
 			}
-		}
+		}*/
 	}
 	
 }

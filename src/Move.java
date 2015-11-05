@@ -22,9 +22,9 @@ public class Move {
 
 
 	HashMap<Point, Integer> configuration;
-	HashMap<Point, Integer> configuration_left; // = new HashMap<Point, Integer>();
+	HashMap<Point, Integer> configuration_left; 
 	HashMap<Point, Integer> configuration_right;
-	HashMap<Point, Integer> configuration_back_left; // = new HashMap<Point, Integer>();
+	HashMap<Point, Integer> configuration_back_left; 
 	HashMap<Point, Integer> configuration_back_right;
 	HashMap<Point, Integer> configuration_back_up;
 
@@ -37,10 +37,8 @@ public class Move {
 
 		configuration_back_up = new HashMap<Point, Integer>();
 		configuration_back_up.putAll(configuration1);
-		//		System.out.println("poitn to move "+configuration_back_up.get(point_to_move));
 		if(configuration_back_up.get(point_to_move) >1 && configuration_back_up.get(point_to_move)<99){
 			is_king = true;
-//			System.out.println("king 1 ");
 		}
 		configuration = new HashMap<Point, Integer>();
 		configuration.putAll(configuration1);
@@ -87,9 +85,6 @@ public class Move {
 				configuration_left.put(captured_piece, 99);
 				configuration_left.put(point_to_move, 99);
 				configuration_left.put(point_moved_to_left, color_value);
-//				point_to_move = point_moved_to_left;
-
-				//				System.out.println("restore after "+configuration_left.get(point_moved_to_left)+" point "+point_moved_to_left);
 			}
 
 		}
@@ -121,14 +116,11 @@ public class Move {
 				configuration_right.put(captured_piece, 99);
 				configuration_right.put(point_to_move, 99);
 				configuration_right.put(point_moved_to_right, color_value);
-//				point_to_move = point_moved_to_right;
-
 			}
 			
 		}
 
 		if(is_king){
-//			System.out.println("king ");
 			if(configuration_back_left.containsKey(point_moved_to_back_left) && configuration_back_left.get(point_moved_to_back_left)== 99 && !second_move){
 				configuration_back_left.put(point_to_move, 99);
 				configuration_back_left.put(point_moved_to_back_left, color_value);
@@ -154,7 +146,6 @@ public class Move {
 					configuration_back_left.put(captured_piece, 99);
 					configuration_back_left.put(point_to_move, 99);
 					configuration_back_left.put(point_moved_to_back_left, color_value);
-//					point_to_move = point_moved_to_back_left;
 
 				}
 				
@@ -176,19 +167,12 @@ public class Move {
 				if(configuration_back_right.containsKey(point_moved_to_back_right) && configuration_back_right.get(point_moved_to_back_right)==99){
 					captured_piece = new Point(point_to_move.x+1, point_to_move.y-color_value);
 					captured_pieces.add(captured_piece);
-				/*	if(move_value == 0 && !back_left_king){
-						right = left = back_left = false;
-					}
-					else{
-						right = left = false;
-					}*/
 					back_right = right = left = back_left = false;
 					back_right_capture = true;
 					move_value++;
 					configuration_back_right.put(captured_piece, 99);
 					configuration_back_right.put(point_to_move, 99);
 					configuration_back_right.put(point_moved_to_back_right, color_value);
-//					point_to_move = point_moved_to_back_right;
 
 				}
 				
@@ -216,9 +200,7 @@ public class Move {
 			configuration_restore.put(moved_to, 9);
 		}
 		if(is_king){
-//						System.out.println("restore pre "+configuration_restore.get(moved_to)+" point "+moved_to+",   point to move "+point_to_move);
 			configuration_restore.put(moved_to, color_value+10); 
-//			System.out.println("restore kings "+configuration_back_right);
 		}
 		
 	}
