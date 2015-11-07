@@ -28,7 +28,7 @@ import javax.swing.WindowConstants;
 public class Play1 {
 
 	static int mov_no = 0;
-	JFrame mainFrame = new JFrame("Checkers");
+	JFrame mainFrame = new JFrame("Checkers    Present board");
 	PlainBoard plainBoard;
 	int no_simple_moves = 0;
 	int piece_color = 1;
@@ -128,11 +128,20 @@ public class Play1 {
 			move_queue[i][0] = next_moves.get(i);
 			move_queue[i][1] = -1000000000;
 		}
-
+ int alpha = 0;
 		while(!out_of_time){
-			if(move_queue.length>0){
-				preliminary_board = (HashMap<Point, Integer>) move_queue[0][0];
-			}
+			
+			
+			Arrays.sort(move_queue, new Comparator<Object[]>() {
+				public int compare(Object[] O1, Object[] O2) {
+					Integer first = (Integer)O1[1];
+					Integer second = (Integer)O2[1];
+					return -first.compareTo(second);
+				}
+			});
+			preliminary_board = (HashMap<Point, Integer>) move_queue[0][0];
+			
+//			System.out.println("140  alpha "+alpha+",  depth limit "+depthLimit);
 			search_dept = depthLimit;
 			average_branching_factor = Math.pow(number_of_leaf_nodes, 1/(double)search_dept);
 			DecimalFormat df = new DecimalFormat("#.00"); 
@@ -147,18 +156,22 @@ public class Play1 {
 			depthLimit++;
 			color_value = 1;
 
-			int alpha = -100000;
+			alpha = -100000;
 			int beta = 100000;
 			for (int i=0; i<move_queue.length; i++) {
 
 				int v = alpha_beta((HashMap<Point, Integer>) move_queue[i][0], alpha, beta, false, 1);
+				System.out.println("164 v     "+v+",  depth limit "+depthLimit);
+				
+				
 				if(v >alpha){
 					alpha = v;
 				}
+//				System.out.println("161  alpha "+alpha+",  depth limit "+depthLimit);
 				move_queue[i][0] = move_queue[i][0];
 				move_queue[i][1] = alpha;
 			}
-
+/*
 			Arrays.sort(move_queue, new Comparator<Object[]>() {
 				public int compare(Object[] O1, Object[] O2) {
 					Integer first = (Integer)O1[1];
@@ -166,6 +179,7 @@ public class Play1 {
 					return -first.compareTo(second);
 				}
 			});
+			*/
 			if(alpha == 100000){
 				out_of_time = true;
 			}
@@ -239,7 +253,7 @@ public class Play1 {
 		t2 = System.currentTimeMillis();
 		time_for_move = t2-t1;
 		if(new_frame){
-			JFrame previousMove = new JFrame("Previous move  "+ alphaVal);
+			JFrame previousMove = new JFrame("Move no. "+ (previous_boards.size()-1));
 			previousMove.setLocation(x, y);
 			PlainBoard plainBoard_p = new PlainBoard(board, piece_color, msg);
 			previousMove.add(plainBoard_p, BorderLayout.CENTER);
@@ -276,7 +290,7 @@ public class Play1 {
 		
 		board_seen_before.removeAll(board_seen_before);
 		present_depth = depth;
-		if(System.currentTimeMillis()-t1>14999){
+		if(System.currentTimeMillis()-t1>14998){
 			out_of_time=true;
 		}
 		if(!out_of_time){
@@ -286,6 +300,9 @@ public class Play1 {
 				number_of_leaf_nodes++;
 				Evaluation eval = new Evaluation(testBoard, 1, mover);
 				int evaluate_board = eval.sum;
+				if(evaluate_board>90000){
+					evaluate_board = evaluate_board-depth*100;
+				}
 				return evaluate_board;
 			}
 
@@ -300,7 +317,7 @@ public class Play1 {
 				}
 				else if(!(testBoard.containsValue(-1*color_value) || testBoard.containsValue(-1*color_value+10))){
 					number_of_leaf_nodes++;
-					return 100000;
+					return 100000-depth*100;
 				}
 				else if(next_move.moves.size() == 0){
 					number_of_leaf_nodes++;
@@ -329,7 +346,7 @@ public class Play1 {
 
 				if(!(testBoard.containsValue(color_value) || testBoard.containsValue(color_value+10))){
 					number_of_leaf_nodes++;
-					return 100000;
+					return 100000-depth*100;
 				}
 				else if(!(testBoard.containsValue(-1*color_value) || testBoard.containsValue(-1*color_value+10))){
 					number_of_leaf_nodes++;
@@ -339,7 +356,7 @@ public class Play1 {
 				}
 				else if(next_move.moves.size() == 0){
 					number_of_leaf_nodes++;
-					return 100000;
+					return 100000-depth*100;
 				}
 
 				while(alpha<beta && next_move.moves.size()>0){ 
