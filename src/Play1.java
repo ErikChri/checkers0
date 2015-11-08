@@ -76,9 +76,14 @@ public class Play1 {
 	ArrayList<HashMap<Point, Integer>>temp_choose_next_move = new ArrayList<HashMap<Point, Integer>>();
 	ArrayList<HashMap<Point, Integer>> board_seen_before = new ArrayList<HashMap<Point, Integer>>();
 	ArrayList<HashMap<Point, Integer>> next_moves = new ArrayList<HashMap<Point, Integer>>();
-	ArrayList<HashMap<Point, Integer>> board_played_before = new ArrayList<HashMap<Point, Integer>>();
+	//	ArrayList<HashMap<Point, Integer>> board_played_before = new ArrayList<HashMap<Point, Integer>>();
 	ArrayList<HashMap<Point, Integer>> previous_boards = new ArrayList<HashMap<Point, Integer>>();
 	//	HashSet<HashMap<Point, Integer>> board_played_before = new HashSet<HashMap<Point, Integer>>();
+	int[] board_played_before = new int[32];
+	int[] temp_board = new int[32];
+	//	ArrayList<int[]> already_played_board = new ArrayList<int[]>();
+	int[][] already_played_board = new int[150][32];
+	int w =0;
 
 	//Buttons
 	JButton change_side = new JButton("change side");
@@ -122,16 +127,57 @@ public class Play1 {
 		MoveGenerator next_move = new MoveGenerator(board, color_value);
 
 		next_moves.addAll(next_move.moves);
-		
+		ArrayList<Integer> remove_list = new ArrayList<Integer>();
+		boolean remove = false;
+		for(int l=next_moves.size()-1; l>-1; l--){
+			int k = 0;
+			for(int i = 0; i<8; i++){
+				for(int j=0; j<8; j++){
+					if(next_moves.get(l).containsKey(new Point(j,i))){
+						temp_board[k] = next_moves.get(l).get(new Point(j,i));
+						k++;
+					}
+				}
+			}
+
+			
+			for(int i= 0; i<150; i++){
+				remove = true;
+				for(int r=0; r<32; r++){
+					if(already_played_board[i][r] != 0){}
+						//						System.out.println(already_played_board[i][r]+", "+temp_board[r]);
+						if(already_played_board[i][r] != temp_board[r]){
+							remove = false;
+							break;
+						}
+					
+				}
+				if(remove){
+					remove_list.add(l);
+				}
+
+
+				//				System.out.println("i "+i);
+				if(already_played_board[i].equals(temp_board)){
+
+					//					next_moves.remove(l);
+					break;
+				}
+			}
+		}
+		for( int i=0; i<remove_list.size(); i++){
+			next_moves.remove(i);
+		}
+
 		move_queue = new Object[next_moves.size()][2];
 		for(int i=0; i<move_queue.length; i++){
 			move_queue[i][0] = next_moves.get(i);
 			move_queue[i][1] = -1000000000;
 		}
- int alpha = 0;
+		int alpha = 0;
 		while(!out_of_time){
-			
-			
+
+
 			Arrays.sort(move_queue, new Comparator<Object[]>() {
 				public int compare(Object[] O1, Object[] O2) {
 					Integer first = (Integer)O1[1];
@@ -140,8 +186,8 @@ public class Play1 {
 				}
 			});
 			preliminary_board = (HashMap<Point, Integer>) move_queue[0][0];
-			
-//			System.out.println("140  alpha "+alpha+",  depth limit "+depthLimit);
+
+			//			System.out.println("140  alpha "+alpha+",  depth limit "+depthLimit);
 			search_dept = depthLimit;
 			average_branching_factor = Math.pow(number_of_leaf_nodes, 1/(double)search_dept);
 			DecimalFormat df = new DecimalFormat("#.00"); 
@@ -161,17 +207,17 @@ public class Play1 {
 			for (int i=0; i<move_queue.length; i++) {
 
 				int v = alpha_beta((HashMap<Point, Integer>) move_queue[i][0], alpha, beta, false, 1);
-				System.out.println("164 v     "+v+",  depth limit "+depthLimit);
-				
-				
+				//				System.out.println("164 v     "+v+",  depth limit "+depthLimit);
+
+
 				if(v >alpha){
 					alpha = v;
 				}
-//				System.out.println("161  alpha "+alpha+",  depth limit "+depthLimit);
+				//				System.out.println("161  alpha "+alpha+",  depth limit "+depthLimit);
 				move_queue[i][0] = move_queue[i][0];
 				move_queue[i][1] = alpha;
 			}
-/*
+			/*
 			Arrays.sort(move_queue, new Comparator<Object[]>() {
 				public int compare(Object[] O1, Object[] O2) {
 					Integer first = (Integer)O1[1];
@@ -179,15 +225,15 @@ public class Play1 {
 					return -first.compareTo(second);
 				}
 			});
-			*/
+			 */
 			if(alpha == 100000){
 				out_of_time = true;
 			}
 			else if(alpha == -100000){
 				out_of_time = true;
 			}
-			
-			
+
+
 
 		}
 
@@ -209,6 +255,28 @@ public class Play1 {
 			msg = "Black wins the game";
 			show(board, 0, 0, false);
 		}
+
+		//		board_played_before = new int[32];
+
+
+		int k = 0;
+		for(int i = 0; i<8; i++){
+			for(int j=0; j<8; j++){
+				if(board.get(new Point(j,i)) != null){
+					already_played_board[w][k] = board.get(new Point(j,i));
+					k++;
+				}
+			}
+		}
+		w++;
+		for(int i= 0; i<150; i++){
+			for(int r=0; r<32; r++){
+				if(already_played_board[i][r] != 0){
+					//					System.out.println(already_played_board[i][r]);
+				}
+			}
+		}
+
 		show(board, 0, 0, false);
 
 
@@ -287,7 +355,7 @@ public class Play1 {
 
 	//Min-max and alpha-beta algorithm
 	private int alpha_beta(HashMap<Point, Integer> testBoard, int alpha, int beta, boolean is_alpha_node, int depth){
-		
+
 		board_seen_before.removeAll(board_seen_before);
 		present_depth = depth;
 		if(System.currentTimeMillis()-t1>14998){
