@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Move {
 
-	// Attributes
+
 	Point point_moved_to_left;
 	Point point_moved_to_right;
 	Point point_moved_to_back_left;
@@ -17,8 +17,7 @@ public class Move {
 	int move_value;
 	boolean second_move, left, right,  back_left, back_right, is_king, back_left_capture,back_right_capture, left_capture, right_capture;
 	int color_value;
-	int move_direction; // = -1;
-	
+
 
 
 	HashMap<Point, Integer> configuration;
@@ -32,21 +31,23 @@ public class Move {
 	public Move(HashMap<Point, Integer> configuration1, int color_value, Point point_to_move, boolean second_move){
 		this.point_to_move = point_to_move; 
 		this.color_value = color_value;
-		this.move_direction = move_direction;
 		this.second_move = second_move;
 
 		configuration_back_up = new HashMap<Point, Integer>();
 		configuration_back_up.putAll(configuration1);
+		//check if piece to move is a king
 		if(configuration_back_up.get(point_to_move) >1 && configuration_back_up.get(point_to_move)<99){
 			is_king = true;
 		}
 		configuration = new HashMap<Point, Integer>();
 		configuration.putAll(configuration1);
+		//check for kings and remove them from testboard, they are stored in configuration_back_up
 		for (Map.Entry<Point, Integer> entry : configuration.entrySet()) {
 			if(entry.getValue()>1 && entry.getValue()<99){
 				entry.setValue(entry.getValue()-10);
 			}
 		}
+		//construct boards for moving in the various directions
 		configuration_left = new HashMap<Point, Integer>();
 		configuration_left.putAll(configuration);
 		configuration_right = new HashMap<Point, Integer>();
@@ -55,10 +56,8 @@ public class Move {
 		configuration_back_left.putAll(configuration);
 		configuration_back_right = new HashMap<Point, Integer>();
 		configuration_back_right.putAll(configuration);
-
+		//find the moves
 		move(point_to_move);
-
-
 	}
 
 	void move(Point point_to_move){
@@ -71,7 +70,7 @@ public class Move {
 			configuration_left.put(point_to_move, 99);
 			configuration_left.put(point_moved_to_left, color_value);
 			left = true;
-			
+
 		}
 		else if(configuration_left.containsKey(point_moved_to_left) && configuration_left.get(point_moved_to_left)==-1*color_value){
 
@@ -88,7 +87,7 @@ public class Move {
 			}
 
 		}
-	
+
 		if(configuration_right.containsKey(point_moved_to_right) && configuration_right.get(point_moved_to_right)== 99 && !second_move){   
 			configuration_right.put(point_to_move, 99);
 			configuration_right.put(point_moved_to_right, color_value);
@@ -98,8 +97,8 @@ public class Move {
 			else{
 				right = true;  
 			}
-			
-			
+
+
 		}
 		else if(configuration_right.containsKey(point_moved_to_right) && configuration_right.get(point_moved_to_right)==-1*color_value){
 
@@ -108,7 +107,7 @@ public class Move {
 				captured_piece = new Point(point_to_move.x+1, point_to_move.y+color_value);
 				captured_pieces.add(captured_piece);
 				if(move_value == 0){
-					
+
 				}
 				left = right = false;
 				right_capture = true;
@@ -117,9 +116,9 @@ public class Move {
 				configuration_right.put(point_to_move, 99);
 				configuration_right.put(point_moved_to_right, color_value);
 			}
-			
-		}
 
+		}
+		// if the piece to test is a king check for backwards moves
 		if(is_king){
 			if(configuration_back_left.containsKey(point_moved_to_back_left) && configuration_back_left.get(point_moved_to_back_left)== 99 && !second_move){
 				configuration_back_left.put(point_to_move, 99);
@@ -130,7 +129,7 @@ public class Move {
 				else{
 					back_left = true;
 				}
-				
+
 			}
 			else if(configuration_back_left.containsKey(point_moved_to_back_left) && configuration_back_left.get(point_moved_to_back_left)==-1*color_value){
 
@@ -148,7 +147,7 @@ public class Move {
 					configuration_back_left.put(point_moved_to_back_left, color_value);
 
 				}
-				
+
 			}
 			if(configuration_back_right.containsKey(point_moved_to_back_right) && configuration_back_right.get(point_moved_to_back_right)== 99 && !second_move){
 				configuration_back_right.put(point_to_move, 99);
@@ -159,7 +158,7 @@ public class Move {
 				else{
 					back_right = true;
 				}
-				
+
 			}
 			else if(configuration_back_right.containsKey(point_moved_to_back_right) && configuration_back_right.get(point_moved_to_back_right)==-1*color_value){
 
@@ -175,7 +174,7 @@ public class Move {
 					configuration_back_right.put(point_moved_to_back_right, color_value);
 
 				}
-				
+
 			}
 
 		}
@@ -187,21 +186,25 @@ public class Move {
 
 
 	void restore_kings_to_board(HashMap<Point, Integer> configuration_restore, Point moved_to){
+
 		for (Map.Entry<Point, Integer> entry : configuration_back_up.entrySet()) {
+			//check if the piece was not captured, if not restore to king
 			if(entry.getValue()>1 && entry.getValue()<99 && configuration_restore.get(entry.getKey()) != 99 ){     //System.out.println("restore "+entry.getKey()+",  "+ entry.getValue()+", restore "+configuration_restore.get(entry.getKey()));
 				configuration_restore.put(entry.getKey(), entry.getValue()); 
-				
+
 			}
 		}
+		//check if moved piece has become a king
 		if(configuration_restore.containsKey(moved_to) && configuration_restore.get(moved_to) == 1 && moved_to.y == 7){
 			configuration_restore.put(moved_to, 1+10);
-				}
+		}
 		else if(configuration_restore.containsKey(moved_to) && configuration_restore.get(moved_to) == -1 && moved_to.y == 0){
 			configuration_restore.put(moved_to, 9);
 		}
+		//restore moved piece to king
 		if(is_king){
 			configuration_restore.put(moved_to, color_value+10); 
 		}
-		
+
 	}
 }

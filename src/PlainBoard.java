@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 
 
 public class PlainBoard extends JPanel implements MouseListener{
-	
+
 	HashMap<Point, Integer> configuration = new HashMap<Point, Integer>();
 	int sizeVar = 5;
 	Point to_move;
@@ -24,79 +24,79 @@ public class PlainBoard extends JPanel implements MouseListener{
 	Point captured_piece;
 	int piece_color = 1;
 	String msg = "";
-	
+
 	int color_value;
 	public PlainBoard(HashMap<Point, Integer> configuration, int piece_color, String msg){
 		this.configuration = configuration;
 		this.piece_color = piece_color;
 		this.msg = msg;
-		
+
 		addMouseListener(this);
-		
+
 	}
 
 	public void paint (Graphics g) {
-	    Graphics2D g2 = (Graphics2D) g;
-	    RenderingHints rh = new RenderingHints(
-	             RenderingHints.KEY_TEXT_ANTIALIASING,
-	             RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-	    g2.setRenderingHints(rh);
-	    Color gold = new Color(255,165,0);
-	    Color black = new Color(0,0,0);
-	    Color white = new Color(100,0,180);
-	    
-	    // Create plain board
-	    Color grey = new Color(170,170,170); //.gray;
-	    Color red = Color.red;
-	    g2.setColor(Color.black); 
-	    g2.setStroke(new BasicStroke(2));
-	    for(int i=0; i<8; i++){
-	    	if(g2.getColor().equals(red)){
-	    		g2.setColor(grey);
-	    	}
-	    	else{
-	    		g2.setColor(red);
-	    	}
-	    	for(int j=0; j<8; j++){
-	    		if(g2.getColor().equals(red)){
-	    		g2.setColor(grey);
-	    	}
-	    	else{
-	    		g2.setColor(red);
-	    	}
-	    		g2.fillRect(10*sizeVar*i, 10*sizeVar*j, 10*sizeVar, 10*sizeVar);
-	    	}
-	    }
-	   
-	    // Put pieces on board
-	    for (Map.Entry<Point, Integer> entry : configuration.entrySet()) {
-	    	if(entry.getValue()==piece_color){
-	    		g2.setColor(black);
-	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
-	    	}
-	    	else if(entry.getValue()==-piece_color){
-	    		g2.setColor(white);
-	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
-	    	}
-	    	else if(entry.getValue()==piece_color+10){
-	    		g2.setColor(black);
-	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
-	    		g2.setStroke(new BasicStroke(5));
-	    		g2.setColor(gold);
-	    		g2.drawOval(entry.getKey().x*10*sizeVar+8, entry.getKey().y*10*sizeVar+8, 7*sizeVar, 7*sizeVar);
-	    	}
-	    	else if(entry.getValue()==-piece_color+10){
-	    		g2.setColor(white);
-	    		g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
-	    		g2.setStroke(new BasicStroke(5));
-	    		g2.setColor(gold);
-	    		g2.drawOval(entry.getKey().x*10*sizeVar+8, entry.getKey().y*10*sizeVar+8, 7*sizeVar, 7*sizeVar);
-	    	}
-	    	
-	    }
-	    g2.setColor(black);
-	    g2.setFont(new Font("TimesRoman", Font.BOLD, 30)); 
-	    g2.drawString(msg, 25, 200);
+		Graphics2D g2 = (Graphics2D) g;
+		RenderingHints rh = new RenderingHints(
+				RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2.setRenderingHints(rh);
+		Color gold = new Color(255,165,0);
+		Color black = new Color(0,0,0);
+		Color white = new Color(100,0,180);
+
+		// Create plain board
+		Color grey = new Color(170,170,170); //.gray;
+		Color red = Color.red;
+		g2.setColor(Color.black); 
+		g2.setStroke(new BasicStroke(2));
+		for(int i=0; i<8; i++){
+			if(g2.getColor().equals(red)){
+				g2.setColor(grey);
+			}
+			else{
+				g2.setColor(red);
+			}
+			for(int j=0; j<8; j++){
+				if(g2.getColor().equals(red)){
+					g2.setColor(grey);
+				}
+				else{
+					g2.setColor(red);
+				}
+				g2.fillRect(10*sizeVar*i, 10*sizeVar*j, 10*sizeVar, 10*sizeVar);
+			}
+		}
+
+		// Put pieces on board
+		for (Map.Entry<Point, Integer> entry : configuration.entrySet()) {
+			if(entry.getValue()==piece_color){
+				g2.setColor(black);
+				g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
+			}
+			else if(entry.getValue()==-piece_color){
+				g2.setColor(white);
+				g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
+			}
+			else if(entry.getValue()==piece_color+10){
+				g2.setColor(black);
+				g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
+				g2.setStroke(new BasicStroke(5));
+				g2.setColor(gold);
+				g2.drawOval(entry.getKey().x*10*sizeVar+8, entry.getKey().y*10*sizeVar+8, 7*sizeVar, 7*sizeVar);
+			}
+			else if(entry.getValue()==-piece_color+10){
+				g2.setColor(white);
+				g2.fillOval(entry.getKey().x*10*sizeVar, entry.getKey().y*10*sizeVar, 10*sizeVar, 10*sizeVar);
+				g2.setStroke(new BasicStroke(5));
+				g2.setColor(gold);
+				g2.drawOval(entry.getKey().x*10*sizeVar+8, entry.getKey().y*10*sizeVar+8, 7*sizeVar, 7*sizeVar);
+			}
+
+		}
+		g2.setColor(black);
+		g2.setFont(new Font("TimesRoman", Font.BOLD, 30)); 
+		g2.drawString(msg, 25, 200);
 	}
 
 	@Override
@@ -106,19 +106,19 @@ public class PlainBoard extends JPanel implements MouseListener{
 		captured_piece = new Point(x,y);
 		configuration.put(captured_piece, 99);
 		repaint();
-		
+
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -126,10 +126,10 @@ public class PlainBoard extends JPanel implements MouseListener{
 		int x = e.getX()/(10*sizeVar);
 		int y = e.getY()/(10*sizeVar);
 		to_move = new Point(x,y);
-		
+
 		color_value = configuration.get(to_move);
 		configuration.put(to_move, 99);
-		
+
 	}
 
 	@Override
@@ -143,6 +143,6 @@ public class PlainBoard extends JPanel implements MouseListener{
 		configuration.put(move_to, color_value);
 		repaint();
 	}
-	
-	
+
+
 }
